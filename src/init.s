@@ -102,6 +102,15 @@
     jsr pickup_init         ; Clear all pickup slots
     jsr enemy_spawn_screen  ; Spawn test enemies on starting screen
 
+    ; ----- Initialize HUD (status bar) -----
+    ; Rendering must be off for direct VRAM writes.
+    ; map_init re-enabled rendering, so disable it briefly.
+    lda #$00
+    sta PPUMASK
+    jsr hud_init            ; Write HUD tiles to nametable rows 0-1
+    lda ppu_mask_shadow
+    sta PPUMASK             ; Re-enable rendering
+
     ; ----- Initialize audio system -----
     jsr audio_init          ; Set up FamiStudio engine with music + SFX data
 
