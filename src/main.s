@@ -12,6 +12,7 @@
 .include "enums.inc"
 .include "map.inc"
 .include "combat.inc"
+.include "hud.inc"
 
 .segment "PRG_FIXED"
 
@@ -82,8 +83,15 @@
     jsr pickup_update
     jsr pickup_draw
 
+    ; Update HUD (checks for HP/magic changes, queues PPU buffer writes)
+    jsr hud_update
+
     ; Check for screen edge transition
     jsr map_check_transition
+    cmp #$01                ; Did a transition occur?
+    bne @no_transition
+    jsr hud_draw_full       ; Redraw HUD after screen load overwrote it
+@no_transition:
 
     jmp @state_done
 
