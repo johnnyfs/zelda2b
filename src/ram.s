@@ -7,6 +7,7 @@
 ; ============================================================================
 
 .include "globals.inc"
+.include "map.inc"
 
 ; ============================================================================
 ; Zero Page Variables ($0000-$00FF)
@@ -61,6 +62,13 @@ oam_offset:         .res 1      ; Next free OAM slot offset (0-255)
 ; --- MMC3 bank shadows ---
 current_prg_bank_0: .res 1      ; Current PRG bank at $8000-$9FFF
 current_prg_bank_1: .res 1      ; Current PRG bank at $A000-$BFFF
+
+; --- Map engine ---
+current_screen_x:   .res 1      ; Current screen X in map grid
+current_screen_y:   .res 1      ; Current screen Y in map grid
+current_screen_id:  .res 1      ; Current screen index
+map_row_counter:    .res 1      ; Metatile row counter
+map_col_counter:    .res 1      ; Metatile column counter
 
 ; ============================================================================
 ; OAM Shadow Buffer ($0200-$02FF)

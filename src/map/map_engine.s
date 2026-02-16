@@ -235,7 +235,9 @@
 @attr_row_loop:
     lda temp_2
     cmp #$08
-    bcs @attr_done
+    bcc @attr_row_ok
+    jmp @attr_done
+@attr_row_ok:
 
     lda #$00
     sta temp_3              ; attr_col (0..7)
@@ -243,7 +245,9 @@
 @attr_col_loop:
     lda temp_3
     cmp #$08
-    bcs @attr_row_next
+    bcc @attr_col_ok
+    jmp @attr_row_next
+@attr_col_ok:
 
     ; Build attribute byte from 4 metatiles
     ; meta_row = attr_row * 2, meta_col = attr_col * 2

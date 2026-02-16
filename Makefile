@@ -42,6 +42,7 @@ SOURCES := \
 	$(SRCDIR)/gfx/ppu.s \
 	$(SRCDIR)/gfx/sprites.s \
 	$(SRCDIR)/player/player.s \
+	$(SRCDIR)/map/map_vars.s \
 	$(SRCDIR)/map/map_collision.s \
 	$(SRCDIR)/map/map_engine.s \
 	$(SRCDIR)/map/map_transition.s \
