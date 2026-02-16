@@ -1,0 +1,51 @@
+{
+  "octorok_down_1": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "octorok_down_2": [
+    4,
+    5,
+    6,
+    7
+  ],
+  "octorok_right_1": [
+    8,
+    9,
+    10,
+    11
+  ],
+  "octorok_right_2": [
+    12,
+    13,
+    14,
+    15
+  ],
+  "octorok_left_1": [
+    16,
+    17,
+    18,
+    19
+  ],
+  "octorok_left_2": [
+    20,
+    21,
+    22,
+    23
+  ],
+  "octorok_up_1": [
+    24,
+    25,
+    26,
+    27
+  ],
+  "octorok_up_2": [
+    28,
+    29,
+    30,
+    31
+  ],
+  "notes": "Left = H-flip of right. Up = H-flip of down (approximate)."
+}
