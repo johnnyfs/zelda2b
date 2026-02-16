@@ -41,9 +41,13 @@ SOURCES := \
 	$(SRCDIR)/gamepad.s \
 	$(SRCDIR)/gfx/ppu.s \
 	$(SRCDIR)/gfx/sprites.s \
+	$(SRCDIR)/player/player.s \
+	$(SRCDIR)/map/map_vars.s \
 	$(SRCDIR)/map/map_engine.s \
 	$(SRCDIR)/map/map_transition.s \
+	$(SRCDIR)/map/map_collision.s \
 	$(SRCDIR)/data/palettes.s \
+	$(SRCDIR)/data/test_screen.s \
 	$(SRCDIR)/data/metatiles.s \
 	$(SRCDIR)/data/map_screens.s \
 	$(SRCDIR)/data/chr_data.s \

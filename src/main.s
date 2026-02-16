@@ -8,6 +8,7 @@
 .include "nes.inc"
 .include "globals.inc"
 .include "enums.inc"
+.include "map.inc"
 
 .segment "PRG_FIXED"
 
@@ -68,10 +69,13 @@
 ; --- State: Gameplay ---
 @state_gameplay:
     jsr player_update
+    jsr map_check_transition ; Check if player crossed screen edge
     jmp @state_done
 
 ; --- State: Paused ---
 @state_paused:
+    ; Still draw the player while paused
+    jsr player_draw
     ; Press START to unpause
     lda pad1_pressed
     and #BUTTON_START
@@ -98,154 +102,6 @@
     jmp @loop
 .endproc
 
-; ============================================================================
-; player_update - Handle player movement and animation
-; ============================================================================
-; Reads pad1_state and moves the player accordingly.
-; Also draws the player sprite.
-; ============================================================================
-
-.proc player_update
-    ; --- Check directional input ---
-    lda pad1_state
-
-    ; Check UP
-    pha
-    and #BUTTON_UP
-    beq @not_up
-    lda player_y
-    sec
-    sbc player_speed
-    cmp #8                  ; Top boundary
-    bcc @not_up
-    sta player_y
-    lda #DIR_UP
-    sta player_dir
-@not_up:
-
-    ; Check DOWN
-    pla
-    pha
-    and #BUTTON_DOWN
-    beq @not_down
-    lda player_y
-    clc
-    adc player_speed
-    cmp #224                ; Bottom boundary
-    bcs @not_down
-    sta player_y
-    lda #DIR_DOWN
-    sta player_dir
-@not_down:
-
-    ; Check LEFT
-    pla
-    pha
-    and #BUTTON_LEFT
-    beq @not_left
-    lda player_x
-    sec
-    sbc player_speed
-    cmp #0
-    beq @not_left
-    sta player_x
-    lda #DIR_LEFT
-    sta player_dir
-@not_left:
-
-    ; Check RIGHT
-    pla
-    and #BUTTON_RIGHT
-    beq @not_right
-    lda player_x
-    clc
-    adc player_speed
-    cmp #248                ; Right boundary
-    bcs @not_right
-    sta player_x
-    lda #DIR_RIGHT
-    sta player_dir
-@not_right:
-
-    ; --- Check START for pause ---
-    lda pad1_pressed
-    and #BUTTON_START
-    beq @no_pause
-    lda #GAME_STATE_PAUSED
-    sta game_state
-@no_pause:
-
-    ; --- Draw player sprite (16x16 = 4 hardware sprites) ---
-    ; Top-left sprite
-    lda player_y
-    ldx oam_offset
-    sta $0200, x            ; Y position
-    inx
-    lda #$02                ; Tile index (placeholder player tile)
-    sta $0200, x
-    inx
-    lda #$00                ; Attributes (palette 0, no flip)
-    sta $0200, x
-    inx
-    lda player_x
-    sta $0200, x            ; X position
-    inx
-
-    ; Top-right sprite
-    lda player_y
-    sta $0200, x            ; Y
-    inx
-    lda #$03                ; Tile index
-    sta $0200, x
-    inx
-    lda #$00                ; Attributes
-    sta $0200, x
-    inx
-    lda player_x
-    clc
-    adc #8
-    sta $0200, x            ; X + 8
-    inx
-
-    ; Bottom-left sprite
-    lda player_y
-    clc
-    adc #8
-    sta $0200, x            ; Y + 8
-    inx
-    lda #$12                ; Tile index
-    sta $0200, x
-    inx
-    lda #$00                ; Attributes
-    sta $0200, x
-    inx
-    lda player_x
-    sta $0200, x            ; X
-    inx
-
-    ; Bottom-right sprite
-    lda player_y
-    clc
-    adc #8
-    sta $0200, x            ; Y + 8
-    inx
-    lda #$13                ; Tile index
-    sta $0200, x
-    inx
-    lda #$00                ; Attributes
-    sta $0200, x
-    inx
-    lda player_x
-    clc
-    adc #8
-    sta $0200, x            ; X + 8
-    inx
-
-    ; Update OAM offset
-    stx oam_offset
-
-    rts
-.endproc
 
 ; ============================================================================
 ; clear_remaining_oam - Hide unused sprite slots
