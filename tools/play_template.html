@@ -230,34 +230,9 @@
 
   <div class="footer">Powered by JSNES | Click canvas to focus</div>
 
-  <!-- JSNES from CDN with fallback -->
+  <!-- JSNES inlined for offline/sandboxed use -->
+  <script>PLACEHOLDER_JSNES_LIB</script>
   <script>
-    // Load JSNES from CDN with fallback
-    function loadScript(src) {
-      return new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = src;
-        s.onload = resolve;
-        s.onerror = reject;
-        document.head.appendChild(s);
-      });
-    }
-
-    async function loadJSNES() {
-      try {
-        await loadScript('https://cdn.jsdelivr.net/npm/jsnes@1.2.1/dist/jsnes.min.js');
-        return true;
-      } catch (e) {
-        console.warn('jsdelivr failed, trying unpkg...');
-      }
-      try {
-        await loadScript('https://unpkg.com/jsnes@1.2.1/dist/jsnes.min.js');
-        return true;
-      } catch (e) {
-        console.error('Failed to load JSNES from any CDN');
-      }
-      return false;
-    }
 
     // =========================================================================
     // NES Emulator Core
@@ -458,12 +433,11 @@
       });
     });
 
-    // Boot sequence
-    (async function main() {
+    // Boot sequence (JSNES is inlined above, no CDN needed)
+    (function main() {
       try {
-        let loaded = await loadJSNES();
-        if (!loaded) {
-          showError('Failed to load NES emulator library. Check your internet connection.');
+        if (typeof jsnes === 'undefined') {
+          showError('JSNES library not loaded. Rebuild with make_preview.sh.');
           return;
         }
 

@@ -63,16 +63,26 @@ if [ -z "$ROM_BASE64" ]; then
     exit 1
 fi
 
-# Replace the placeholder in the template.
-# We use a Python one-liner for reliable string replacement, since the base64
-# data can be very large and may contain characters that trip up sed.
+# Read the inlined JSNES library
+JSNES_PATH="${SCRIPT_DIR}/jsnes.min.js"
+if [ ! -f "$JSNES_PATH" ]; then
+    echo "ERROR: JSNES library not found: $JSNES_PATH" >&2
+    echo "  Download: curl -sL https://cdn.jsdelivr.net/npm/jsnes@1.2.1/dist/jsnes.min.js -o $JSNES_PATH" >&2
+    exit 1
+fi
+
+# Replace both placeholders:
+# - PLACEHOLDER_JSNES_LIB → inlined JSNES library code
+# - PLACEHOLDER_ROM_BASE64 → base64-encoded ROM data
 python3 -c "
 import sys
 template = open(sys.argv[1], 'r').read()
-rom_b64 = sys.argv[2]
-result = template.replace('PLACEHOLDER_ROM_BASE64', rom_b64)
-open(sys.argv[3], 'w').write(result)
-" "$TEMPLATE" "$ROM_BASE64" "$OUTPUT"
+jsnes_code = open(sys.argv[2], 'r').read()
+rom_b64 = sys.argv[3]
+result = template.replace('PLACEHOLDER_JSNES_LIB', jsnes_code)
+result = result.replace('PLACEHOLDER_ROM_BASE64', rom_b64)
+open(sys.argv[4], 'w').write(result)
+" "$TEMPLATE" "$JSNES_PATH" "$ROM_BASE64" "$OUTPUT"
 
 # Verify output was created
 if [ ! -f "$OUTPUT" ]; then
