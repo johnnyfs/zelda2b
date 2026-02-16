@@ -12,6 +12,7 @@
 .include "audio.inc"
 .include "map.inc"
 .include "combat.inc"
+.include "hud.inc"
 
 .segment "PRG_FIXED"
 

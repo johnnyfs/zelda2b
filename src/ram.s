@@ -9,6 +9,7 @@
 .include "globals.inc"
 .include "map.inc"
 .include "combat.inc"
+.include "hud.inc"
 
 ; ============================================================================
 ; Zero Page Variables ($0000-$00FF)
@@ -87,6 +88,11 @@ player_hp:          .res 1      ; Current hit points
 player_max_hp:      .res 1      ; Maximum hit points
 player_invuln_timer:.res 1      ; Invincibility frames countdown
 
+; --- HUD state ---
+hud_dirty:          .res 1      ; Non-zero = HUD needs VRAM update
+hud_hp_cache:       .res 1      ; Cached player HP (detect changes)
+hud_magic_cache:    .res 1      ; Cached magic value (detect changes)
+
 ; --- Pickup state (parallel arrays, MAX_PICKUPS=4 slots) ---
 pickup_x:           .res MAX_PICKUPS    ; X positions
 pickup_y:           .res MAX_PICKUPS    ; Y positions
@@ -110,5 +116,5 @@ oam_buffer:         .res 256    ; 64 sprites x 4 bytes each (accessed at $0200)
 .segment "RAM"
 
 ; --- PPU write buffer (for deferred VRAM writes during NMI) ---
-ppu_buffer:         .res 64     ; PPU write buffer (64 bytes)
+ppu_buffer:         .res 96     ; PPU write buffer (96 bytes, HUD needs ~44)
 ppu_buffer_len:     .res 1      ; Current length of buffered data

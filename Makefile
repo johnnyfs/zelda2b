@@ -41,6 +41,7 @@ SOURCES := \
 	$(SRCDIR)/gamepad.s \
 	$(SRCDIR)/gfx/ppu.s \
 	$(SRCDIR)/gfx/sprites.s \
+	$(SRCDIR)/gfx/hud.s \
 	$(SRCDIR)/player/player.s \
 	$(SRCDIR)/player/player_combat.s \
 	$(SRCDIR)/enemies/enemy_common.s \
