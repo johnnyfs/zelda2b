@@ -11,6 +11,7 @@
 .include "enums.inc"
 .include "audio.inc"
 .include "map.inc"
+.include "combat.inc"
 
 .segment "PRG_FIXED"
 
@@ -94,6 +95,10 @@
 
     ; ----- Initialize map engine and load starting screen -----
     jsr map_init
+
+    ; ----- Initialize combat system -----
+    jsr combat_init         ; Initialize player combat state (HP, attack)
+    jsr enemy_spawn_screen  ; Spawn test enemies on starting screen
 
     ; ----- Initialize audio system -----
     jsr audio_init          ; Set up FamiStudio engine with music + SFX data

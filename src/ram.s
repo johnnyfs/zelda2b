@@ -8,6 +8,7 @@
 
 .include "globals.inc"
 .include "map.inc"
+.include "combat.inc"
 
 ; ============================================================================
 ; Zero Page Variables ($0000-$00FF)
@@ -69,6 +70,22 @@ map_col_counter:    .res 1      ; Column counter for screen loading
 ; --- MMC3 bank shadows ---
 current_prg_bank_0: .res 1      ; Current PRG bank at $8000-$9FFF
 current_prg_bank_1: .res 1      ; Current PRG bank at $A000-$BFFF
+
+; --- Enemy state (parallel arrays, MAX_ENEMIES=4 slots) ---
+enemy_x:            .res MAX_ENEMIES    ; X positions
+enemy_y:            .res MAX_ENEMIES    ; Y positions
+enemy_type:         .res MAX_ENEMIES    ; Enemy type IDs
+enemy_hp:           .res MAX_ENEMIES    ; Hit points
+enemy_state:        .res MAX_ENEMIES    ; State (inactive/active/hurt/dying)
+enemy_dir:          .res MAX_ENEMIES    ; Facing direction
+enemy_timer:        .res MAX_ENEMIES    ; General purpose timer
+
+; --- Player combat state ---
+player_state:       .res 1      ; Player action state (normal/attack)
+player_attack_timer:.res 1      ; Attack animation countdown
+player_hp:          .res 1      ; Current hit points
+player_max_hp:      .res 1      ; Maximum hit points
+player_invuln_timer:.res 1      ; Invincibility frames countdown
 
 ; ============================================================================
 ; OAM Shadow Buffer ($0200-$02FF)

@@ -11,6 +11,7 @@
 .include "globals.inc"
 .include "enums.inc"
 .include "map.inc"
+.include "combat.inc"
 
 .segment "PRG_FIXED"
 
@@ -72,6 +73,10 @@
 @state_gameplay:
     ; Player movement, animation, collision, and sprite drawing
     jsr player_update
+
+    ; Update and draw enemies
+    jsr enemy_update
+    jsr enemy_draw
 
     ; Check for screen edge transition
     jsr map_check_transition

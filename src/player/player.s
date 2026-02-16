@@ -4,6 +4,7 @@
 .include "nes.inc"
 .include "globals.inc"
 .include "enums.inc"
+.include "combat.inc"
 
 PLAYER_SPEED_LO     = $80
 PLAYER_SPEED_HI     = $01
@@ -44,6 +45,14 @@ SCREEN_RIGHT        = 240
     sta game_state
     rts
 @no_pause:
+
+    ; --- Combat update (checks attack input, handles sword, damage) ---
+    ; Returns carry set if player is attacking (suppress movement)
+    jsr combat_update
+    bcc @do_movement            ; Carry clear = no attack, allow movement
+    jmp @skip_movement          ; In attack state - no movement
+@do_movement:
+
     lda #$00
     sta player_moving
 
@@ -163,6 +172,7 @@ SCREEN_RIGHT        = 240
     sta player_x
 @horiz_done:
 
+@skip_movement:
     ; --- Animation ---
     lda player_moving
     beq @anim_idle
@@ -185,6 +195,15 @@ SCREEN_RIGHT        = 240
 .endproc
 
 .proc player_draw
+    ; --- Invincibility flash: hide player on odd frames ---
+    lda player_invuln_timer
+    beq @no_flash
+    lda frame_counter
+    and #$02                    ; Flash every 2 frames (faster than enemy flash)
+    beq @no_flash               ; Zero = draw this frame
+    jmp @skip_draw              ; Non-zero = skip draw (flash effect)
+@no_flash:
+
     ; Look up base tile from direction + animation frame
     lda player_dir
     asl
@@ -264,6 +283,8 @@ SCREEN_RIGHT        = 240
     sta $0200, x
     inx
     stx oam_offset
+
+@skip_draw:
     rts
 .endproc
 
