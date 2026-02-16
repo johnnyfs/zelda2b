@@ -12,6 +12,7 @@
 .include "enums.inc"
 .include "map.inc"
 .include "combat.inc"
+.include "bombs.inc"
 .include "hud.inc"
 
 .segment "PRG_FIXED"
@@ -82,6 +83,10 @@
     ; Update and draw pickups
     jsr pickup_update
     jsr pickup_draw
+
+    ; Update and draw bombs
+    jsr bomb_update
+    jsr bomb_draw
 
     ; Update HUD (checks for HP/magic changes, queues PPU buffer writes)
     jsr hud_update

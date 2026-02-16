@@ -12,6 +12,7 @@
 .include "audio.inc"
 .include "map.inc"
 .include "combat.inc"
+.include "bombs.inc"
 .include "hud.inc"
 
 .segment "PRG_FIXED"
@@ -100,6 +101,7 @@
     ; ----- Initialize combat system -----
     jsr combat_init         ; Initialize player combat state (HP, attack)
     jsr pickup_init         ; Clear all pickup slots
+    jsr bomb_init           ; Clear bomb slots, set starting inventory
     jsr enemy_spawn_screen  ; Spawn test enemies on starting screen
 
     ; ----- Initialize HUD (status bar) -----

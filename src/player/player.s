@@ -289,11 +289,11 @@ SCREEN_RIGHT        = 240
 .endproc
 
 ; Sprite tile table: base tile (TL) for each direction + animation frame.
-; Frame 0 = solid (color 3), Frame 1 = outline (color 1) for pulsating.
-; Each direction has distinct tiles (no H-flip). Left has its own set.
+; Tile indices from LINK_TILES.json (LA DX ripped sprites, 34 tiles).
+; Each direction has 2 walk frames, 4 tiles each (TL, TR, BL, BR).
 ; Draw routine adds: TR=base+1, BL=base+2, BR=base+3.
 sprite_tile_table:
-    .byte $05, $11    ; DIR_UP   frame 0 (solid), frame 1 (outline)
-    .byte $01, $0D    ; DIR_DOWN frame 0 (solid), frame 1 (outline)
-    .byte $19, $1D    ; DIR_LEFT frame 0 (solid), frame 1 (outline)
-    .byte $09, $15    ; DIR_RIGHT frame 0 (solid), frame 1 (outline)
+    .byte $08, $0C    ; DIR_UP    frame 0 (walk_up_1), frame 1 (walk_up_2)
+    .byte $00, $04    ; DIR_DOWN  frame 0 (walk_down_1), frame 1 (walk_down_2)
+    .byte $10, $14    ; DIR_LEFT  frame 0 (walk_left_1), frame 1 (walk_left_2)
+    .byte $18, $1C    ; DIR_RIGHT frame 0 (walk_right_1), frame 1 (walk_right_2)

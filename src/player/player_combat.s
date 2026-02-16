@@ -9,6 +9,7 @@
 .include "globals.inc"
 .include "enums.inc"
 .include "combat.inc"
+.include "bombs.inc"
 .include "audio.inc"
 
 ; Overlap threshold for AABB collision (in pixels)
@@ -85,6 +86,13 @@ OVERLAP_THRESHOLD   = 14
     rts
 
 @no_attack:
+    ; --- Check for B button press (place bomb) ---
+    lda pad1_pressed
+    and #BUTTON_B
+    beq @no_bomb
+    jsr bomb_place              ; Places bomb if inventory > 0 and slot free
+@no_bomb:
+
     ; Not attacking - check enemy contact damage
     jsr check_player_damage
     clc                         ; Signal: normal movement allowed

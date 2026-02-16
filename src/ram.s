@@ -9,6 +9,7 @@
 .include "globals.inc"
 .include "map.inc"
 .include "combat.inc"
+.include "bombs.inc"
 .include "hud.inc"
 
 ; ============================================================================
@@ -100,6 +101,13 @@ pickup_type:        .res MAX_PICKUPS    ; Pickup type IDs
 pickup_state:       .res MAX_PICKUPS    ; State (inactive/active/spawning)
 pickup_timer:       .res MAX_PICKUPS    ; Timer (spawn animation)
 
+; --- Bomb state (parallel arrays, MAX_BOMBS=2 slots) ---
+bomb_x:             .res MAX_BOMBS      ; X positions
+bomb_y:             .res MAX_BOMBS      ; Y positions
+bomb_state:         .res MAX_BOMBS      ; State (inactive/fuse/exploding/smoke)
+bomb_timer:         .res MAX_BOMBS      ; Countdown timer
+player_bombs:       .res 1              ; Current bomb inventory count
+
 ; ============================================================================
 ; OAM Shadow Buffer ($0200-$02FF)
 ; ============================================================================
@@ -118,3 +126,8 @@ oam_buffer:         .res 256    ; 64 sprites x 4 bytes each (accessed at $0200)
 ; --- PPU write buffer (for deferred VRAM writes during NMI) ---
 ppu_buffer:         .res 96     ; PPU write buffer (96 bytes, HUD needs ~44)
 ppu_buffer_len:     .res 1      ; Current length of buffered data
+
+; --- Collision map (built from metatile solid flags during screen load) ---
+; Each byte is 0 (passable) or 1 (solid), indexed by metatile_row * 16 + metatile_col.
+; Derived from metatile attribute byte bit 7 — same data that drives visual rendering.
+collision_map:      .res MAP_SCREEN_SIZE  ; 224 bytes (16x14)

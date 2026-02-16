@@ -70,6 +70,9 @@ GLOBALS_INC = 1
 .global ppu_buffer              ; PPU write buffer (64 bytes)
 .global ppu_buffer_len          ; Current length of buffered data
 
+; --- Collision map (derived from metatile solid flags at screen load time) ---
+.global collision_map           ; 224 bytes (16x14): 0=passable, 1=solid
+
 ; ============================================================================
 ; Shared Subroutine Imports/Exports
 ; ============================================================================
