@@ -45,6 +45,7 @@ SOURCES := \
 	$(SRCDIR)/player/player_combat.s \
 	$(SRCDIR)/enemies/enemy_common.s \
 	$(SRCDIR)/enemies/enemy_types.s \
+	$(SRCDIR)/items/pickups.s \
 	$(SRCDIR)/map/map_vars.s \
 	$(SRCDIR)/map/map_collision.s \
 	$(SRCDIR)/map/map_engine.s \

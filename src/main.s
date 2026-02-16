@@ -78,6 +78,10 @@
     jsr enemy_update
     jsr enemy_draw
 
+    ; Update and draw pickups
+    jsr pickup_update
+    jsr pickup_draw
+
     ; Check for screen edge transition
     jsr map_check_transition
 

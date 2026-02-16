@@ -98,6 +98,7 @@
 
     ; ----- Initialize combat system -----
     jsr combat_init         ; Initialize player combat state (HP, attack)
+    jsr pickup_init         ; Clear all pickup slots
     jsr enemy_spawn_screen  ; Spawn test enemies on starting screen
 
     ; ----- Initialize audio system -----

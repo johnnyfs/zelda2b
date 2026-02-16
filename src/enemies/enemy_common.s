@@ -85,9 +85,20 @@
 @update_dying:
     dec enemy_timer, x
     bne @next                   ; Still in death animation
-    ; Death animation done - deactivate slot
+    ; Death animation done - spawn pickup at enemy position, then deactivate
+    lda enemy_x, x
+    sta temp_2                  ; pickup X
+    lda enemy_y, x
+    sta temp_3                  ; pickup Y
     lda #ENEMY_STATE_INACTIVE
     sta enemy_state, x
+    ; Save X, call pickup_spawn (A=type, temp_2/3=position)
+    txa
+    pha
+    lda #PICKUP_HEART
+    jsr pickup_spawn
+    pla
+    tax
     jmp @next
 
 @next:
