@@ -204,7 +204,22 @@ SCREEN_RIGHT        = 240
     jmp @skip_draw              ; Non-zero = skip draw (flash effect)
 @no_flash:
 
-    ; Look up base tile from direction + animation frame
+    ; Look up base tile: use attack sprites if attacking, else walk sprites
+    lda player_state
+    cmp #PLAYER_STATE_ATTACK
+    bne @use_walk_tiles
+
+    ; Attack state: use attack body tile table (1 frame per direction)
+    lda player_dir
+    tax
+    lda attack_tile_table, x
+    sta ptr_lo              ; base tile index (TL)
+    lda #OAM_PALETTE_0
+    sta ptr_hi              ; attribute byte (no flip)
+    jmp @tiles_chosen
+
+@use_walk_tiles:
+    ; Normal state: use walk tile table (2 frames per direction)
     lda player_dir
     asl
     clc
@@ -214,6 +229,8 @@ SCREEN_RIGHT        = 240
     sta ptr_lo              ; base tile index (TL)
     lda #OAM_PALETTE_0
     sta ptr_hi              ; attribute byte (no flip)
+
+@tiles_chosen:
 
     ldx oam_offset
     ; Sprite 0: Top-left
