@@ -10,14 +10,20 @@ MAP_INC = 1
 ; ============================================================================
 ; Map Screen Dimensions (in metatiles)
 ; ============================================================================
-; Each screen is 16 metatiles wide x 15 metatiles tall.
+; Top 2 tile rows (16 pixels) are reserved for the status bar.
+; Map area: 16 metatiles wide x 14 metatiles tall = 28 tile rows.
+; Total nametable: 2 status rows + 28 map rows = 30 tile rows.
 ; Each metatile is 2x2 hardware tiles (16x16 pixels).
-; Screen pixel size: 256x240
+; Map pixel area: 256x224 (status bar takes top 16px)
 
 MAP_SCREEN_W        = 16        ; Screen width in metatiles
-MAP_SCREEN_H        = 15        ; Screen height in metatiles
-MAP_SCREEN_SIZE     = 240       ; MAP_SCREEN_W * MAP_SCREEN_H bytes per screen
-MAP_SCREEN_BYTES    = 240       ; Alias for MAP_SCREEN_SIZE
+MAP_SCREEN_H        = 14        ; Screen height in metatiles (was 15, -1 for status bar)
+MAP_SCREEN_SIZE     = 224       ; MAP_SCREEN_W * MAP_SCREEN_H bytes per screen
+MAP_SCREEN_BYTES    = 224       ; Alias for MAP_SCREEN_SIZE
+
+; Status bar layout
+STATUS_BAR_ROWS     = 2         ; Tile rows reserved for status bar at top
+STATUS_BAR_Y_PX     = 16        ; Pixel height of status bar
 
 ; ============================================================================
 ; Map Grid Dimensions (in screens)

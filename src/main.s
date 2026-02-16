@@ -10,6 +10,7 @@
 .include "nes.inc"
 .include "globals.inc"
 .include "enums.inc"
+.include "map.inc"
 
 .segment "PRG_FIXED"
 
@@ -71,6 +72,10 @@
 @state_gameplay:
     ; Player movement, animation, collision, and sprite drawing
     jsr player_update
+
+    ; Check for screen edge transition
+    jsr map_check_transition
+
     jmp @state_done
 
 ; --- State: Paused ---

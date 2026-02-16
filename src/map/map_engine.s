@@ -2,8 +2,14 @@
 ; map_engine.s - Map Engine Core
 ; ============================================================================
 ; Handles loading screens from map data into the PPU nametable.
-; Each screen is 16x15 metatiles (256x240 pixels).
+; Top 2 tile rows (16 pixels) reserved for status bar.
+; Map area: 16x14 metatiles (256x224 pixels).
 ; Each metatile is 2x2 hardware tiles (16x16 pixels).
+;
+; Nametable layout:
+;   $2000-$203F: Status bar (2 tile rows, 64 bytes)
+;   $2040-$23BF: Map metatiles (14 rows x 2 tile rows = 28 tile rows, 896 bytes)
+;   $23C0-$23FF: Attribute table (64 bytes)
 ;
 ; This code runs in the fixed bank (PRG_FIXED).
 ; Metatile and screen data are in PRG_FIXED_C.
@@ -61,7 +67,7 @@
 ; map_load_screen - Load a screen into nametable 0
 ; ============================================================================
 ; Input: A = screen index (0-5)
-; Disables rendering, writes full nametable + attribute table, re-enables.
+; Disables rendering, writes status bar + metatile map + attributes, re-enables.
 ; ============================================================================
 
 .proc map_load_screen
@@ -86,17 +92,30 @@
     lda #$00
     sta PPUADDR
 
+    ; --- Write status bar (2 tile rows = 64 tiles) ---
+    ; Fill with tile $00 (blank) for now — status bar rendering
+    ; will be implemented later with health/item display
+    lda #$00
+    ldx #64                 ; 2 rows x 32 tiles
+@status_loop:
+    sta PPUDATA
+    dex
+    bne @status_loop
+
     ; --- Decode metatiles row by row ---
+    ; PPU address is now at $2040 (start of map area)
     ; Each metatile row produces 2 rows of tiles (32 bytes each)
-    ; Screen is 16 metatiles wide x 15 metatiles tall
+    ; Screen is 16 metatiles wide x 14 metatiles tall
 
     lda #$00
-    sta map_row_counter     ; Current metatile row (0..14)
+    sta map_row_counter     ; Current metatile row (0..13)
 
 @row_loop:
     lda map_row_counter
-    cmp #MAP_SCREEN_H       ; 15 rows
-    bcs @rows_done
+    cmp #MAP_SCREEN_H       ; 14 rows
+    bcc @row_ok
+    jmp @rows_done
+@row_ok:
 
     ; --- First tile row (top halves of metatiles) ---
     lda #$00
