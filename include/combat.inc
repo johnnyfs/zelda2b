@@ -77,6 +77,40 @@ SWORD_HITBOX_H          = 12    ; Sword hitbox height
 .globalzp player_invuln_timer   ; Invincibility countdown after damage
 
 ; ============================================================================
+; Pickup System Constants
+; ============================================================================
+
+MAX_PICKUPS             = 4         ; Maximum active pickup slots
+
+; Pickup types
+PICKUP_NONE             = 0         ; Empty slot
+PICKUP_HEART            = 1         ; Restores 1 HP
+PICKUP_MAGIC            = 2         ; Restores magic (future)
+
+; Pickup states
+PICKUP_STATE_INACTIVE   = 0         ; Slot available
+PICKUP_STATE_ACTIVE     = 1         ; On ground, collectible
+PICKUP_STATE_SPAWNING   = 2         ; Brief spawn animation (rising)
+
+; Pickup timers
+PICKUP_LIFETIME         = 0         ; 0 = persist until collected (no timeout)
+PICKUP_SPAWN_TIME       = 8         ; Frames of spawn animation
+PICKUP_COLLECT_DIST     = 12        ; Overlap distance for collection
+
+; Pickup sprite tiles (from sprite pattern table)
+PICKUP_HEART_TILE       = $25       ; Single 8x8 tile for heart pickup
+
+; ============================================================================
+; Pickup Zero-Page Variable Declarations
+; ============================================================================
+
+.globalzp pickup_x              ; X positions (MAX_PICKUPS bytes)
+.globalzp pickup_y              ; Y positions (MAX_PICKUPS bytes)
+.globalzp pickup_type           ; Pickup type (MAX_PICKUPS bytes)
+.globalzp pickup_state          ; State (MAX_PICKUPS bytes)
+.globalzp pickup_timer          ; Timer (MAX_PICKUPS bytes)
+
+; ============================================================================
 ; Combat Subroutine Declarations
 ; ============================================================================
 
@@ -93,5 +127,11 @@ SWORD_HITBOX_H          = 12    ; Sword hitbox height
 .global combat_init             ; Initialize player combat state
 .global combat_update           ; Check for attack input, handle sword
 .global check_player_damage     ; Check enemy overlap, apply damage
+
+; -- items/pickups.s --
+.global pickup_init             ; Clear all pickup slots
+.global pickup_update           ; Update pickups (collection check + animation)
+.global pickup_draw             ; Draw all active pickup sprites
+.global pickup_spawn            ; Spawn a pickup: A=type, temp_2=X, temp_3=Y
 
 .endif ; COMBAT_INC

@@ -87,6 +87,13 @@ player_hp:          .res 1      ; Current hit points
 player_max_hp:      .res 1      ; Maximum hit points
 player_invuln_timer:.res 1      ; Invincibility frames countdown
 
+; --- Pickup state (parallel arrays, MAX_PICKUPS=4 slots) ---
+pickup_x:           .res MAX_PICKUPS    ; X positions
+pickup_y:           .res MAX_PICKUPS    ; Y positions
+pickup_type:        .res MAX_PICKUPS    ; Pickup type IDs
+pickup_state:       .res MAX_PICKUPS    ; State (inactive/active/spawning)
+pickup_timer:       .res MAX_PICKUPS    ; Timer (spawn animation)
+
 ; ============================================================================
 ; OAM Shadow Buffer ($0200-$02FF)
 ; ============================================================================
