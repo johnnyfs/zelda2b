@@ -185,23 +185,19 @@ SCREEN_RIGHT        = 240
 .endproc
 
 .proc player_draw
+    ; Look up base tile from direction + animation frame
     lda player_dir
     asl
     clc
     adc player_anim_frame
     tax
     lda sprite_tile_table, x
-    sta ptr_lo
+    sta ptr_lo              ; base tile index (TL)
     lda #OAM_PALETTE_0
-    sta ptr_hi
-    lda player_dir
-    cmp #DIR_LEFT
-    bne @not_left
-    lda #OAM_PALETTE_0 | OAM_FLIP_H
-    sta ptr_hi
-@not_left:
+    sta ptr_hi              ; attribute byte (no flip)
+
     ldx oam_offset
-    ; Sprite 0: Top-left (or top-right if flipped)
+    ; Sprite 0: Top-left
     lda player_y
     sta $0200, x
     inx
@@ -211,19 +207,10 @@ SCREEN_RIGHT        = 240
     lda ptr_hi
     sta $0200, x
     inx
-    lda player_dir
-    cmp #DIR_LEFT
-    bne @s0_normal
     lda player_x
-    clc
-    adc #8
-    jmp @s0_write
-@s0_normal:
-    lda player_x
-@s0_write:
     sta $0200, x
     inx
-    ; Sprite 1: Top-right (or top-left if flipped)
+    ; Sprite 1: Top-right
     lda player_y
     sta $0200, x
     inx
@@ -235,16 +222,9 @@ SCREEN_RIGHT        = 240
     lda ptr_hi
     sta $0200, x
     inx
-    lda player_dir
-    cmp #DIR_LEFT
-    bne @s1_normal
-    lda player_x
-    jmp @s1_write
-@s1_normal:
     lda player_x
     clc
     adc #8
-@s1_write:
     sta $0200, x
     inx
     ; Sprite 2: Bottom-left
@@ -255,22 +235,13 @@ SCREEN_RIGHT        = 240
     inx
     lda ptr_lo
     clc
-    adc #$02              ; CHR layout: BL = base + 2
+    adc #2
     sta $0200, x
     inx
     lda ptr_hi
     sta $0200, x
     inx
-    lda player_dir
-    cmp #DIR_LEFT
-    bne @s2_normal
     lda player_x
-    clc
-    adc #8
-    jmp @s2_write
-@s2_normal:
-    lda player_x
-@s2_write:
     sta $0200, x
     inx
     ; Sprite 3: Bottom-right
@@ -281,22 +252,15 @@ SCREEN_RIGHT        = 240
     inx
     lda ptr_lo
     clc
-    adc #$03              ; CHR layout: BR = base + 3
+    adc #3
     sta $0200, x
     inx
     lda ptr_hi
     sta $0200, x
     inx
-    lda player_dir
-    cmp #DIR_LEFT
-    bne @s3_normal
-    lda player_x
-    jmp @s3_write
-@s3_normal:
     lda player_x
     clc
     adc #8
-@s3_write:
     sta $0200, x
     inx
     stx oam_offset
@@ -304,11 +268,11 @@ SCREEN_RIGHT        = 240
 .endproc
 
 ; Sprite tile table: base tile (TL) for each direction + animation frame.
-; Frame 0 = solid fill (color 3), Frame 1 = outline (color 1) for pulsating effect.
+; Frame 0 = solid (color 3), Frame 1 = outline (color 1) for pulsating.
+; Each direction has distinct tiles (no H-flip). Left has its own set.
 ; Draw routine adds: TR=base+1, BL=base+2, BR=base+3.
-; Left = Right tiles with H-flip.
 sprite_tile_table:
     .byte $05, $11    ; DIR_UP   frame 0 (solid), frame 1 (outline)
     .byte $01, $0D    ; DIR_DOWN frame 0 (solid), frame 1 (outline)
-    .byte $09, $15    ; DIR_LEFT frame 0, 1 (uses RIGHT tiles, flipped)
-    .byte $09, $15    ; DIR_RIGHT frame 0, 1
+    .byte $19, $1D    ; DIR_LEFT frame 0 (solid), frame 1 (outline)
+    .byte $09, $15    ; DIR_RIGHT frame 0 (solid), frame 1 (outline)
