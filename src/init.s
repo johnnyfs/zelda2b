@@ -80,15 +80,8 @@
     lda #GAME_STATE_GAMEPLAY
     sta game_state
 
-    ; Initialize player position (center of screen)
-    lda #120                ; X = 120
-    sta player_x
-    lda #112                ; Y = 112
-    sta player_y
-    lda #DIR_DOWN
-    sta player_dir
-    lda #1
-    sta player_speed
+    ; ----- Initialize player (via player module) -----
+    jsr player_init
 
     ; ----- Load initial palettes -----
     jsr ppu_load_palette
@@ -104,9 +97,10 @@
     sta PPUADDR
     lda #$AC
     sta PPUADDR
-    ; Write tile indices for "ZELDA 2B" using our CHR font (ASCII - $20 offset)
-    ; Z=5A-20=3A, E=45-20=25, L=4C-20=2C, D=44-20=24, A=41-20=21
-    ; space=00, 2=32-20=12, B=42-20=22
+    ; Write tile indices for "ZELDA 2B" using our CHR font
+    ; Font layout: A=$20, B=$21, ... Z=$39, 0=$3A, 1=$3B, 2=$3C
+    ; space=$44
+    ; Z=$39, E=$24, L=$2B, D=$23, A=$20, space=$44, 2=$3C, B=$21
     ldx #$00
 @write_title:
     lda title_text, x
@@ -140,10 +134,4 @@
     jmp main_loop
 .endproc
 
-; ============================================================================
-; Title text data (tile indices for our font: ASCII code - $20)
-; ============================================================================
-
-title_text:
-    .byte $3A, $25, $2C, $24, $21, $00, $12, $22  ; "ZELDA 2B"
     .byte 0                                         ; null terminator
