@@ -10,7 +10,6 @@
 .include "globals.inc"
 .include "enums.inc"
 .include "audio.inc"
-.include "map.inc"
 
 .segment "PRG_FIXED"
 
@@ -87,15 +86,8 @@
     ; ----- Load initial palettes -----
     jsr ppu_load_palette
 
-    ; ----- Set PPU shadow registers (map_init needs these for re-enable) -----
-    lda #PPUCTRL_NMI_ON | PPUCTRL_BG_0000 | PPUCTRL_SPR_1000
-    sta ppu_ctrl_shadow
-
-    lda #PPUMASK_RENDER_ON
-    sta ppu_mask_shadow
-
-    ; ----- Initialize map engine (loads first screen into nametable) -----
-    jsr map_init
+    ; ----- Load test screen background -----
+    jsr load_test_screen
 
     ; ----- Set initial scroll position -----
     lda PPUSTATUS           ; Reset address latch
@@ -109,11 +101,13 @@
     jsr audio_init          ; Set up FamiStudio engine with music + SFX data
 
     ; ----- Enable PPU rendering -----
-    lda ppu_ctrl_shadow
+    lda #PPUCTRL_NMI_ON | PPUCTRL_BG_0000 | PPUCTRL_SPR_1000
     sta PPUCTRL
+    sta ppu_ctrl_shadow
 
-    lda ppu_mask_shadow
+    lda #PPUMASK_RENDER_ON
     sta PPUMASK
+    sta ppu_mask_shadow
 
     ; ----- Jump to main loop -----
     jmp main_loop

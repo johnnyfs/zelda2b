@@ -4,13 +4,12 @@
 ; The main loop waits for NMI (vblank), reads input, and dispatches to the
 ; current game state handler. Runs in the fixed bank.
 ;
-; player_update and player_draw are now in player/player.s (separate module).
+; Player movement and drawing handled by player/player.s module.
 ; ============================================================================
 
 .include "nes.inc"
 .include "globals.inc"
 .include "enums.inc"
-.include "map.inc"
 
 .segment "PRG_FIXED"
 
@@ -70,13 +69,13 @@
 
 ; --- State: Gameplay ---
 @state_gameplay:
+    ; Player movement, animation, collision, and sprite drawing
     jsr player_update
-    jsr map_check_transition   ; Check for screen edge transitions
     jmp @state_done
 
 ; --- State: Paused ---
 @state_paused:
-    ; Still draw the player while paused (frozen in place)
+    ; Draw player sprite so it remains visible while paused
     jsr player_draw
     ; Press START to unpause
     lda pad1_pressed
@@ -103,7 +102,6 @@
     ; --- Loop back ---
     jmp @loop
 .endproc
-
 
 ; ============================================================================
 ; clear_remaining_oam - Hide unused sprite slots
