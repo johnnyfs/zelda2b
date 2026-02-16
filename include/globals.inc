@@ -113,4 +113,12 @@ GLOBALS_INC = 1
 ; -- data/palettes.s --
 .global default_palette
 
+; -- audio/audio.s --
+.global audio_init
+.global audio_update
+.global audio_play_song
+.global audio_stop_music
+.global audio_pause_music
+.global audio_play_sfx
+
 .endif ; GLOBALS_INC
