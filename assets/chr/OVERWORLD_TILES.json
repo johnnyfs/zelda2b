@@ -1,0 +1,464 @@
+{
+  "grass_plain": {
+    "metatile_id": 0,
+    "tiles": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "grid_pos": [
+      0,
+      10
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "grass_detail": {
+    "metatile_id": 1,
+    "tiles": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "grid_pos": [
+      1,
+      10
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "grass_flowers": {
+    "metatile_id": 2,
+    "tiles": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "grid_pos": [
+      2,
+      10
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "grass_dark": {
+    "metatile_id": 3,
+    "tiles": [
+      12,
+      13,
+      14,
+      15
+    ],
+    "grid_pos": [
+      3,
+      10
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "path_horiz": {
+    "metatile_id": 4,
+    "tiles": [
+      16,
+      17,
+      18,
+      19
+    ],
+    "grid_pos": [
+      4,
+      10
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "path_vert": {
+    "metatile_id": 5,
+    "tiles": [
+      20,
+      21,
+      22,
+      23
+    ],
+    "grid_pos": [
+      5,
+      10
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "ground_1": {
+    "metatile_id": 6,
+    "tiles": [
+      24,
+      25,
+      26,
+      27
+    ],
+    "grid_pos": [
+      6,
+      10
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "ground_2": {
+    "metatile_id": 7,
+    "tiles": [
+      28,
+      29,
+      30,
+      31
+    ],
+    "grid_pos": [
+      7,
+      10
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "ground_3": {
+    "metatile_id": 8,
+    "tiles": [
+      32,
+      33,
+      34,
+      35
+    ],
+    "grid_pos": [
+      0,
+      11
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "ground_4": {
+    "metatile_id": 9,
+    "tiles": [
+      36,
+      37,
+      38,
+      39
+    ],
+    "grid_pos": [
+      1,
+      11
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "tree_top_1": {
+    "metatile_id": 10,
+    "tiles": [
+      40,
+      41,
+      42,
+      43
+    ],
+    "grid_pos": [
+      9,
+      7
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "tree_top_2": {
+    "metatile_id": 11,
+    "tiles": [
+      44,
+      45,
+      46,
+      47
+    ],
+    "grid_pos": [
+      10,
+      7
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "tree_trunk_1": {
+    "metatile_id": 12,
+    "tiles": [
+      48,
+      49,
+      50,
+      51
+    ],
+    "grid_pos": [
+      9,
+      8
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "tree_trunk_2": {
+    "metatile_id": 13,
+    "tiles": [
+      52,
+      53,
+      54,
+      55
+    ],
+    "grid_pos": [
+      10,
+      8
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "tree_round": {
+    "metatile_id": 14,
+    "tiles": [
+      56,
+      57,
+      58,
+      59
+    ],
+    "grid_pos": [
+      11,
+      7
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "bush_1": {
+    "metatile_id": 15,
+    "tiles": [
+      60,
+      61,
+      62,
+      63
+    ],
+    "grid_pos": [
+      8,
+      10
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "water_1": {
+    "metatile_id": 16,
+    "tiles": [
+      64,
+      65,
+      66,
+      67
+    ],
+    "grid_pos": [
+      16,
+      19
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "water_2": {
+    "metatile_id": 17,
+    "tiles": [
+      68,
+      69,
+      70,
+      71
+    ],
+    "grid_pos": [
+      17,
+      19
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "water_3": {
+    "metatile_id": 18,
+    "tiles": [
+      72,
+      73,
+      74,
+      75
+    ],
+    "grid_pos": [
+      16,
+      20
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "water_4": {
+    "metatile_id": 19,
+    "tiles": [
+      76,
+      77,
+      78,
+      79
+    ],
+    "grid_pos": [
+      17,
+      20
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "cliff_top": {
+    "metatile_id": 20,
+    "tiles": [
+      80,
+      81,
+      82,
+      83
+    ],
+    "grid_pos": [
+      0,
+      7
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "cliff_face": {
+    "metatile_id": 21,
+    "tiles": [
+      84,
+      85,
+      86,
+      87
+    ],
+    "grid_pos": [
+      0,
+      8
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "cliff_side": {
+    "metatile_id": 22,
+    "tiles": [
+      88,
+      89,
+      90,
+      91
+    ],
+    "grid_pos": [
+      1,
+      7
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "roof_1": {
+    "metatile_id": 23,
+    "tiles": [
+      92,
+      93,
+      94,
+      95
+    ],
+    "grid_pos": [
+      0,
+      0
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "roof_2": {
+    "metatile_id": 24,
+    "tiles": [
+      96,
+      97,
+      98,
+      99
+    ],
+    "grid_pos": [
+      1,
+      0
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "wall_1": {
+    "metatile_id": 25,
+    "tiles": [
+      100,
+      101,
+      102,
+      103
+    ],
+    "grid_pos": [
+      0,
+      1
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "wall_2": {
+    "metatile_id": 26,
+    "tiles": [
+      104,
+      105,
+      106,
+      107
+    ],
+    "grid_pos": [
+      1,
+      1
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "door": {
+    "metatile_id": 27,
+    "tiles": [
+      108,
+      109,
+      110,
+      111
+    ],
+    "grid_pos": [
+      2,
+      1
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "window": {
+    "metatile_id": 28,
+    "tiles": [
+      112,
+      113,
+      114,
+      115
+    ],
+    "grid_pos": [
+      3,
+      1
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "cave_top": {
+    "metatile_id": 29,
+    "tiles": [
+      116,
+      117,
+      118,
+      119
+    ],
+    "grid_pos": [
+      11,
+      7
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "cave_dark": {
+    "metatile_id": 30,
+    "tiles": [
+      120,
+      121,
+      122,
+      123
+    ],
+    "grid_pos": [
+      12,
+      8
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "sand_1": {
+    "metatile_id": 31,
+    "tiles": [
+      124,
+      125,
+      126,
+      127
+    ],
+    "grid_pos": [
+      20,
+      19
+    ],
+    "note": "TL, TR, BL, BR"
+  },
+  "rock_1": {
+    "metatile_id": 32,
+    "tiles": [
+      128,
+      129,
+      130,
+      131
+    ],
+    "grid_pos": [
+      7,
+      10
+    ],
+    "note": "TL, TR, BL, BR"
+  }
+}
