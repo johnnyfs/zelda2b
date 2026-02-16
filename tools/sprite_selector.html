@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Zelda 2B - Sprite Sheet Selector</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Courier New',monospace;background:#1a1a2e;color:#eee;padding:16px;display:flex;gap:16px;height:100vh}
+.left-panel{flex:1;overflow:auto;position:relative}
+.right-panel{width:340px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;overflow:auto}
+h1{color:#e94560;font-size:18px;margin-bottom:8px}
+h3{color:#53aeff;font-size:13px;margin:8px 0 4px}
+p.note{color:#888;font-size:11px;margin-bottom:6px}
+
+.sheet-tabs{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
+.sheet-tab{background:#16213e;color:#888;border:1px solid #333;padding:5px 10px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:11px}
+.sheet-tab.active{background:#0f3460;color:#53aeff;border-color:#53aeff}
+
+.canvas-container{position:relative;display:inline-block;background:#000;border:1px solid #333;border-radius:4px;cursor:crosshair}
+#sheet-canvas{image-rendering:pixelated}
+#overlay{position:absolute;top:0;left:0;pointer-events:none}
+
+.controls{background:#16213e;padding:10px;border-radius:6px}
+.controls label{font-size:11px;color:#aaa;display:block;margin:4px 0 2px}
+.controls input,.controls select{background:#0f3460;color:#eee;border:1px solid #53aeff;padding:3px 6px;border-radius:3px;font-family:inherit;font-size:11px;width:100%}
+.controls button{background:#0f3460;color:#53aeff;border:1px solid #53aeff;padding:5px 10px;border-radius:3px;cursor:pointer;font-family:inherit;font-size:11px;margin:3px 2px}
+.controls button:hover{background:#53aeff;color:#000}
+.controls button.danger{border-color:#e94560;color:#e94560}
+.controls button.danger:hover{background:#e94560;color:#fff}
+
+.preview-box{background:#16213e;padding:10px;border-radius:6px}
+.preview-canvas{image-rendering:pixelated;border:1px solid #333;background:#000}
+
+.selection-list{background:#16213e;padding:10px;border-radius:6px;flex:1;overflow:auto;min-height:200px}
+.sel-item{display:flex;align-items:center;gap:6px;padding:3px 4px;border-bottom:1px solid #0f3460;font-size:10px;cursor:pointer}
+.sel-item:hover{background:#0f3460}
+.sel-item.active{background:#0f3460;border-left:2px solid #53aeff}
+.sel-item canvas{image-rendering:pixelated;border:1px solid #333;flex-shrink:0}
+.sel-item .info{flex:1;overflow:hidden}
+.sel-item .name{color:#eee;font-size:11px}
+.sel-item .coords{color:#666;font-size:9px}
+
+.coord-display{position:fixed;bottom:10px;left:10px;background:rgba(0,0,0,0.8);padding:4px 8px;border-radius:3px;font-size:11px;color:#53aeff;z-index:100}
+
+.zoom-controls{display:flex;gap:4px;align-items:center;margin-bottom:6px}
+.zoom-controls button{padding:3px 8px}
+
+#export-area{background:#0f3460;color:#eee;border:1px solid #333;padding:6px;border-radius:3px;font-size:10px;width:100%;min-height:80px;resize:vertical;font-family:monospace}
+
+.nes-preview{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.nes-preview canvas{image-rendering:pixelated;border:1px solid #333}
+</style>
+</head>
+<body>
+
+<div class="left-panel">
+  <h1>Sprite Sheet Selector</h1>
+  <div class="sheet-tabs" id="sheet-tabs"></div>
+  <div class="zoom-controls">
+    <button onclick="setZoom(1)">1x</button>
+    <button onclick="setZoom(2)">2x</button>
+    <button onclick="setZoom(3)" id="zoom-btn-3" class="active">3x</button>
+    <button onclick="setZoom(4)">4x</button>
+    <button onclick="setZoom(6)">6x</button>
+    <span style="color:#888;font-size:11px;margin-left:8px">Grid:</span>
+    <button onclick="toggleGrid()" id="grid-btn">16px</button>
+  </div>
+  <div class="canvas-container" id="canvas-container">
+    <canvas id="sheet-canvas"></canvas>
+    <canvas id="overlay"></canvas>
+  </div>
+</div>
+
+<div class="right-panel">
+  <div class="controls">
+    <h3>Selection</h3>
+    <p class="note">Click+drag on sheet to select region. Snaps to grid.</p>
+    <label>Name</label>
+    <input type="text" id="sel-name" placeholder="e.g. link_idle_down">
+    <label>Rect (x, y, w, h)</label>
+    <input type="text" id="sel-rect" placeholder="0, 0, 16, 16" readonly>
+    <label>Grid snap</label>
+    <select id="grid-snap">
+      <option value="1">None</option>
+      <option value="8">8px</option>
+      <option value="16" selected>16px</option>
+    </select>
+    <div style="margin-top:6px">
+      <button onclick="addSelection()">Add Selection</button>
+      <button onclick="clearCurrent()">Clear</button>
+    </div>
+  </div>
+
+  <div class="preview-box">
+    <h3>Preview (NES 4-shade)</h3>
+    <canvas id="preview-canvas" class="preview-canvas" width="64" height="64"></canvas>
+    <div class="nes-preview" id="nes-palettes"></div>
+  </div>
+
+  <div class="selection-list">
+    <h3>Selections (<span id="sel-count">0</span>)</h3>
+    <div id="sel-list"></div>
+    <div style="margin-top:8px">
+      <button onclick="exportSelections()">Export JSON</button>
+      <button onclick="importSelections()">Import JSON</button>
+      <button class="danger" onclick="clearAll()">Clear All</button>
+    </div>
+    <textarea id="export-area" style="display:none"></textarea>
+  </div>
+</div>
+
+<div class="coord-display" id="coord-display">x: 0, y: 0</div>
+
+<script>
+// Sheet definitions - loaded from data URLs or file input
+const SHEETS = [
+  {name:'Link Sprites', file:'link_sprites.png', bg:[0,128,0]},
+  {name:'Overworld Tileset', file:'overworld_tileset.png', bg:[0,64,128]},
+  {name:'Minor Enemies', file:'minor_enemies.png', bg:[0,128,0]},
+  {name:'Weapons/Items/HUD', file:'weapons_items_hud.png', bg:[0,128,0]},
+];
+
+let currentSheet = 0;
+let sheetImages = {};
+let zoom = 3;
+let gridSize = 16;
+let showGrid = true;
+let selections = [];
+let dragStart = null;
+let dragEnd = null;
+let isDragging = false;
+
+const NES = [
+  [0x62,0x62,0x62],[0x00,0x2E,0x98],[0x11,0x13,0xB1],[0x3A,0x00,0xA4],
+  [0x5C,0x00,0x7E],[0x6E,0x00,0x40],[0x6C,0x07,0x00],[0x56,0x1D,0x00],
+  [0x33,0x35,0x00],[0x0B,0x48,0x00],[0x00,0x52,0x00],[0x00,0x4F,0x08],
+  [0x00,0x40,0x4D],[0x00,0x00,0x00],[0x00,0x00,0x00],[0x00,0x00,0x00],
+  [0xAB,0xAB,0xAB],[0x0D,0x57,0xFF],[0x35,0x36,0xFF],[0x6B,0x1C,0xFF],
+  [0x98,0x0B,0xD5],[0xAF,0x0D,0x7B],[0xAD,0x25,0x21],[0x90,0x44,0x00],
+  [0x64,0x62,0x00],[0x31,0x78,0x00],[0x08,0x82,0x00],[0x00,0x7F,0x2A],
+  [0x00,0x6E,0x82],[0x00,0x00,0x00],[0x00,0x00,0x00],[0x00,0x00,0x00],
+  [0xFF,0xFF,0xFF],[0x53,0xAE,0xFF],[0x79,0x8D,0xFF],[0xB4,0x74,0xFF],
+  [0xE4,0x6F,0xFF],[0xF8,0x6C,0xCF],[0xF8,0x7F,0x77],[0xDD,0x9C,0x35],
+  [0xB1,0xB5,0x0C],[0x7F,0xCA,0x1C],[0x56,0xD4,0x45],[0x40,0xD0,0x7D],
+  [0x41,0xC1,0xCF],[0x4E,0x4E,0x4E],[0x00,0x00,0x00],[0x00,0x00,0x00],
+  [0xFF,0xFF,0xFF],[0xB6,0xDB,0xFF],[0xC5,0xCB,0xFF],[0xDA,0xC2,0xFF],
+  [0xF0,0xC0,0xFF],[0xFA,0xBF,0xEB],[0xFA,0xC7,0xC3],[0xEF,0xD4,0xA5],
+  [0xDF,0xDE,0x96],[0xCA,0xE7,0x9B],[0xB7,0xEB,0xAF],[0xAE,0xEA,0xC9],
+  [0xAF,0xE3,0xEA],[0xB5,0xB5,0xB5],[0x00,0x00,0x00],[0x00,0x00,0x00],
+];
+
+const PALETTES = {
+  link: [0x0F,0x19,0x29,0x38],
+  green: [0x0F,0x09,0x19,0x29],
+  enemy: [0x0F,0x06,0x16,0x27],
+  gray: [0x0F,0x00,0x10,0x30],
+};
+
+function rgb(i){const c=NES[i];return `rgb(${c[0]},${c[1]},${c[2]})`}
+
+// Canvas refs
+const sheetCanvas = document.getElementById('sheet-canvas');
+const overlay = document.getElementById('overlay');
+const sheetCtx = sheetCanvas.getContext('2d');
+const overlayCtx = overlay.getContext('2d');
+const container = document.getElementById('canvas-container');
+
+function buildTabs() {
+  const tabs = document.getElementById('sheet-tabs');
+  tabs.innerHTML = '';
+  SHEETS.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'sheet-tab' + (i === currentSheet ? ' active' : '');
+    btn.textContent = s.name;
+    btn.onclick = () => { currentSheet = i; buildTabs(); renderSheet(); };
+    tabs.appendChild(btn);
+  });
+  // Add custom upload button
+  const upload = document.createElement('button');
+  upload.className = 'sheet-tab';
+  upload.textContent = '+ Upload';
+  upload.onclick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/png';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          const name = file.name.replace('.png','');
+          SHEETS.push({name, file: file.name, bg: [0,128,0]});
+          sheetImages[SHEETS.length-1] = img;
+          currentSheet = SHEETS.length - 1;
+          buildTabs();
+          renderSheet();
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  };
+  tabs.appendChild(upload);
+}
+
+function renderSheet() {
+  const img = sheetImages[currentSheet];
+  if (!img) return;
+  sheetCanvas.width = img.width;
+  sheetCanvas.height = img.height;
+  overlay.width = img.width;
+  overlay.height = img.height;
+  sheetCanvas.style.width = (img.width * zoom) + 'px';
+  sheetCanvas.style.height = (img.height * zoom) + 'px';
+  overlay.style.width = (img.width * zoom) + 'px';
+  overlay.style.height = (img.height * zoom) + 'px';
+  sheetCtx.drawImage(img, 0, 0);
+  renderOverlay();
+}
+
+function renderOverlay() {
+  const img = sheetImages[currentSheet];
+  if (!img) return;
+  overlayCtx.clearRect(0, 0, overlay.width, overlay.height);
+
+  // Grid
+  if (showGrid && gridSize > 1) {
+    overlayCtx.strokeStyle = 'rgba(255,255,255,0.15)';
+    overlayCtx.lineWidth = 0.5;
+    for (let x = 0; x < overlay.width; x += gridSize) {
+      overlayCtx.beginPath(); overlayCtx.moveTo(x, 0); overlayCtx.lineTo(x, overlay.height); overlayCtx.stroke();
+    }
+    for (let y = 0; y < overlay.height; y += gridSize) {
+      overlayCtx.beginPath(); overlayCtx.moveTo(0, y); overlayCtx.lineTo(overlay.width, y); overlayCtx.stroke();
+    }
+  }
+
+  // Existing selections for this sheet
+  selections.filter(s => s.sheet === currentSheet).forEach((s, i) => {
+    overlayCtx.strokeStyle = '#53aeff';
+    overlayCtx.lineWidth = 1;
+    overlayCtx.strokeRect(s.x + 0.5, s.y + 0.5, s.w - 1, s.h - 1);
+    overlayCtx.fillStyle = 'rgba(83,174,255,0.15)';
+    overlayCtx.fillRect(s.x, s.y, s.w, s.h);
+    overlayCtx.fillStyle = '#53aeff';
+    overlayCtx.font = '8px monospace';
+    overlayCtx.fillText(s.name || '?', s.x + 1, s.y + 8);
+  });
+
+  // Current drag selection
+  if (dragStart && dragEnd) {
+    const x = Math.min(dragStart.x, dragEnd.x);
+    const y = Math.min(dragStart.y, dragEnd.y);
+    const w = Math.abs(dragEnd.x - dragStart.x);
+    const h = Math.abs(dragEnd.y - dragStart.y);
+    overlayCtx.strokeStyle = '#e94560';
+    overlayCtx.lineWidth = 2;
+    overlayCtx.strokeRect(x, y, w, h);
+    overlayCtx.fillStyle = 'rgba(233,69,96,0.2)';
+    overlayCtx.fillRect(x, y, w, h);
+  }
+}
+
+function getMousePos(e) {
+  const rect = container.getBoundingClientRect();
+  const x = Math.floor((e.clientX - rect.left) / zoom);
+  const y = Math.floor((e.clientY - rect.top) / zoom);
+  return {x, y};
+}
+
+function snapToGrid(v) {
+  const snap = parseInt(document.getElementById('grid-snap').value);
+  if (snap <= 1) return v;
+  return Math.round(v / snap) * snap;
+}
+
+container.addEventListener('mousedown', (e) => {
+  const pos = getMousePos(e);
+  dragStart = {x: snapToGrid(pos.x), y: snapToGrid(pos.y)};
+  dragEnd = null;
+  isDragging = true;
+});
+
+container.addEventListener('mousemove', (e) => {
+  const pos = getMousePos(e);
+  document.getElementById('coord-display').textContent = `x: ${pos.x}, y: ${pos.y}`;
+  if (isDragging) {
+    dragEnd = {x: snapToGrid(pos.x), y: snapToGrid(pos.y)};
+    updateSelRect();
+    renderOverlay();
+    updatePreview();
+  }
+});
+
+container.addEventListener('mouseup', (e) => {
+  if (isDragging) {
+    const pos = getMousePos(e);
+    dragEnd = {x: snapToGrid(pos.x), y: snapToGrid(pos.y)};
+    isDragging = false;
+    updateSelRect();
+    renderOverlay();
+    updatePreview();
+  }
+});
+
+function updateSelRect() {
+  if (!dragStart || !dragEnd) return;
+  const x = Math.min(dragStart.x, dragEnd.x);
+  const y = Math.min(dragStart.y, dragEnd.y);
+  const w = Math.abs(dragEnd.x - dragStart.x);
+  const h = Math.abs(dragEnd.y - dragStart.y);
+  document.getElementById('sel-rect').value = `${x}, ${y}, ${w}, ${h}`;
+}
+
+function updatePreview() {
+  if (!dragStart || !dragEnd) return;
+  const img = sheetImages[currentSheet];
+  if (!img) return;
+
+  const x = Math.min(dragStart.x, dragEnd.x);
+  const y = Math.min(dragStart.y, dragEnd.y);
+  const w = Math.abs(dragEnd.x - dragStart.x) || 1;
+  const h = Math.abs(dragEnd.y - dragStart.y) || 1;
+
+  // Get pixel data
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = img.width; tempCanvas.height = img.height;
+  const tctx = tempCanvas.getContext('2d');
+  tctx.drawImage(img, 0, 0);
+  const imageData = tctx.getImageData(x, y, w, h);
+
+  // Detect bg and map to 4 shades
+  const bg = SHEETS[currentSheet].bg;
+  const pixels = [];
+  const colorCounts = {};
+
+  for (let py = 0; py < h; py++) {
+    const row = [];
+    for (let px = 0; px < w; px++) {
+      const i = (py * w + px) * 4;
+      const r = imageData.data[i], g = imageData.data[i+1], b = imageData.data[i+2], a = imageData.data[i+3];
+      if (a < 128 || (Math.abs(r-bg[0])+Math.abs(g-bg[1])+Math.abs(b-bg[2]) < 20)) {
+        row.push(0);
+      } else {
+        const key = `${r},${g},${b}`;
+        const lum = 0.299*r + 0.587*g + 0.114*b;
+        colorCounts[key] = {count: (colorCounts[key]?.count||0)+1, lum, r, g, b};
+        row.push(-1); // placeholder
+      }
+    }
+    pixels.push(row);
+  }
+
+  // Cluster non-bg colors into 3 shades
+  const colors = Object.values(colorCounts).sort((a,b) => a.lum - b.lum);
+  const colorMap = {};
+  if (colors.length <= 3) {
+    colors.forEach((c, i) => { colorMap[`${c.r},${c.g},${c.b}`] = i + 1; });
+  } else {
+    const n = colors.length;
+    colors.forEach((c, i) => {
+      colorMap[`${c.r},${c.g},${c.b}`] = i < n/3 ? 1 : (i < 2*n/3 ? 2 : 3);
+    });
+  }
+
+  // Fill in shade values
+  for (let py = 0; py < h; py++) {
+    for (let px = 0; px < w; px++) {
+      if (pixels[py][px] === -1) {
+        const i = (py * w + px) * 4;
+        const key = `${imageData.data[i]},${imageData.data[i+1]},${imageData.data[i+2]}`;
+        pixels[py][px] = colorMap[key] || 2;
+      }
+    }
+  }
+
+  // Draw preview
+  const pc = document.getElementById('preview-canvas');
+  const scale = Math.max(1, Math.floor(64 / Math.max(w, h)));
+  pc.width = w * scale; pc.height = h * scale;
+  pc.style.width = (w * scale * 2) + 'px';
+  pc.style.height = (h * scale * 2) + 'px';
+  const pctx = pc.getContext('2d');
+  const grayPal = ['#000000','#555555','#aaaaaa','#ffffff'];
+  for (let py = 0; py < h; py++)
+    for (let px = 0; px < w; px++) {
+      pctx.fillStyle = grayPal[pixels[py][px]];
+      pctx.fillRect(px*scale, py*scale, scale, scale);
+    }
+
+  // NES palette previews
+  const palArea = document.getElementById('nes-palettes');
+  palArea.innerHTML = '';
+  for (const [pname, pal] of Object.entries(PALETTES)) {
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    c.style.width = (w * 3) + 'px'; c.style.height = (h * 3) + 'px';
+    c.className = 'preview-canvas';
+    c.title = pname;
+    const ctx = c.getContext('2d');
+    for (let py = 0; py < h; py++)
+      for (let px = 0; px < w; px++) {
+        const ci = pixels[py][px];
+        if (ci === 0) { ctx.fillStyle = rgb(pal[0]); }
+        else { ctx.fillStyle = rgb(pal[ci]); }
+        ctx.fillRect(px, py, 1, 1);
+      }
+    palArea.appendChild(c);
+    const label = document.createElement('span');
+    label.style.cssText = 'font-size:8px;color:#666;margin-right:6px';
+    label.textContent = pname;
+    palArea.appendChild(label);
+  }
+}
+
+function addSelection() {
+  const name = document.getElementById('sel-name').value.trim();
+  const rect = document.getElementById('sel-rect').value;
+  if (!rect) return;
+  const [x, y, w, h] = rect.split(',').map(s => parseInt(s.trim()));
+  if (!w || !h) return;
+  selections.push({name: name || `sprite_${selections.length}`, sheet: currentSheet, x, y, w, h});
+  document.getElementById('sel-name').value = '';
+  renderSelectionList();
+  renderOverlay();
+}
+
+function clearCurrent() {
+  dragStart = null; dragEnd = null;
+  document.getElementById('sel-rect').value = '';
+  renderOverlay();
+}
+
+function clearAll() {
+  if (confirm('Clear all selections?')) {
+    selections = [];
+    renderSelectionList();
+    renderOverlay();
+  }
+}
+
+function renderSelectionList() {
+  const list = document.getElementById('sel-list');
+  list.innerHTML = '';
+  document.getElementById('sel-count').textContent = selections.length;
+
+  selections.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'sel-item';
+    div.onclick = () => {
+      currentSheet = s.sheet;
+      buildTabs();
+      renderSheet();
+      dragStart = {x: s.x, y: s.y};
+      dragEnd = {x: s.x + s.w, y: s.y + s.h};
+      updateSelRect();
+      renderOverlay();
+      updatePreview();
+    };
+
+    // Mini preview
+    const img = sheetImages[s.sheet];
+    if (img) {
+      const c = document.createElement('canvas');
+      c.width = s.w; c.height = s.h;
+      c.style.width = Math.min(32, s.w*2) + 'px';
+      c.style.height = Math.min(32, s.h*2) + 'px';
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, s.x, s.y, s.w, s.h, 0, 0, s.w, s.h);
+      div.appendChild(c);
+    }
+
+    const info = document.createElement('div');
+    info.className = 'info';
+    info.innerHTML = `<div class="name">${s.name}</div><div class="coords">${SHEETS[s.sheet]?.name}: ${s.x},${s.y} ${s.w}x${s.h}</div>`;
+    div.appendChild(info);
+
+    const del = document.createElement('button');
+    del.textContent = '×';
+    del.style.cssText = 'background:none;border:none;color:#e94560;cursor:pointer;font-size:16px;padding:0 4px';
+    del.onclick = (e) => { e.stopPropagation(); selections.splice(i, 1); renderSelectionList(); renderOverlay(); };
+    div.appendChild(del);
+
+    list.appendChild(div);
+  });
+}
+
+function exportSelections() {
+  const area = document.getElementById('export-area');
+  area.style.display = 'block';
+  const data = {
+    sheets: SHEETS.map(s => ({name: s.name, file: s.file, bg: s.bg})),
+    selections: selections.map(s => ({
+      name: s.name,
+      sheet: SHEETS[s.sheet]?.file || s.sheet,
+      rect: [s.x, s.y, s.w, s.h]
+    }))
+  };
+  area.value = JSON.stringify(data, null, 2);
+  area.select();
+}
+
+function importSelections() {
+  const area = document.getElementById('export-area');
+  area.style.display = 'block';
+  area.placeholder = 'Paste JSON here and click Import again...';
+  if (area.value.trim().startsWith('{')) {
+    try {
+      const data = JSON.parse(area.value);
+      if (data.selections) {
+        data.selections.forEach(s => {
+          const sheetIdx = SHEETS.findIndex(sh => sh.file === s.sheet);
+          if (sheetIdx >= 0) {
+            selections.push({name: s.name, sheet: sheetIdx, x: s.rect[0], y: s.rect[1], w: s.rect[2], h: s.rect[3]});
+          }
+        });
+        renderSelectionList();
+        renderOverlay();
+      }
+    } catch(e) { alert('Invalid JSON: ' + e.message); }
+  }
+}
+
+function setZoom(z) {
+  zoom = z;
+  document.querySelectorAll('.zoom-controls button').forEach(b => b.classList.remove('active'));
+  document.getElementById('zoom-btn-3')?.classList.remove('active');
+  renderSheet();
+}
+
+function toggleGrid() {
+  if (!showGrid) { showGrid = true; gridSize = 8; }
+  else if (gridSize === 8) { gridSize = 16; }
+  else if (gridSize === 16) { gridSize = 32; }
+  else { showGrid = false; }
+  document.getElementById('grid-btn').textContent = showGrid ? gridSize + 'px' : 'Off';
+  renderOverlay();
+}
+
+// Load sheet images
+async function loadSheets() {
+  // Try loading from relative paths (served by HTTP server)
+  for (let i = 0; i < SHEETS.length; i++) {
+    try {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = SHEETS[i].file;
+      });
+      sheetImages[i] = img;
+    } catch(e) {
+      console.log(`Could not load ${SHEETS[i].file}, will need upload`);
+    }
+  }
+  buildTabs();
+  if (sheetImages[0]) renderSheet();
+}
+
+loadSheets();
+</script>
+</body>
+</html>
