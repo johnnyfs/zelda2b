@@ -461,3 +461,10 @@ sprite_tile_table:
     .byte $00, $04    ; DIR_DOWN  frame 0 (walk_down_1), frame 1 (walk_down_2)
     .byte $10, $14    ; DIR_LEFT  frame 0 (walk_left_1), frame 1 (walk_left_2)
     .byte $18, $1C    ; DIR_RIGHT frame 0 (walk_right_1), frame 1 (walk_right_2)
+
+; Attack body tile table: one entry per direction (same body tile as walk frame 0)
+attack_tile_table:
+    .byte $08         ; DIR_UP    attack body = walk_up_1
+    .byte $00         ; DIR_DOWN  attack body = walk_down_1
+    .byte $10         ; DIR_LEFT  attack body = walk_left_1
+    .byte $18         ; DIR_RIGHT attack body = walk_right_1
