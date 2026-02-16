@@ -1,0 +1,21 @@
+# Build artifacts
+build/
+*.o
+
+# ROM files
+*.nes
+
+# macOS
+.DS_Store
+
+# Editor swap files
+*.swp
+*.swo
+*~
+
+# Vim
+.*.swp
+.*.swo
+
+# Generated CHR (keep source PNGs, ignore generated .chr if from pipeline)
+# assets/chr/*.chr is tracked; generated intermediates are not

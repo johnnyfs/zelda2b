@@ -1,0 +1,116 @@
+; ============================================================================
+; globals.inc - Global Variable Declarations
+; ============================================================================
+; Defines all shared zero-page and RAM variables, plus import/export
+; declarations for cross-module symbols.
+; ============================================================================
+
+.ifndef GLOBALS_INC
+GLOBALS_INC = 1
+
+.include "enums.inc"
+
+; ============================================================================
+; Zero Page Variables ($0000-$00FF)
+; Organized by subsystem for clarity.
+; ============================================================================
+
+.globalzp nmi_ready             ; Flag: NMI handler sets, main loop clears
+.globalzp nmi_counter           ; Incremented every NMI (vblank counter)
+.globalzp game_state            ; Current game state (see enums.inc)
+.globalzp frame_counter         ; General purpose frame counter
+
+; --- Temp / scratch variables (used by any routine, not preserved) ---
+.globalzp temp_0
+.globalzp temp_1
+.globalzp temp_2
+.globalzp temp_3
+.globalzp ptr_lo                ; General purpose pointer (low byte)
+.globalzp ptr_hi                ; General purpose pointer (high byte)
+.globalzp ptr2_lo               ; Second pointer (low byte)
+.globalzp ptr2_hi               ; Second pointer (high byte)
+
+; --- Gamepad state ---
+.globalzp pad1_state            ; Controller 1: current frame buttons
+.globalzp pad1_prev             ; Controller 1: previous frame buttons
+.globalzp pad1_pressed          ; Controller 1: newly pressed this frame
+.globalzp pad2_state            ; Controller 2: current frame buttons
+.globalzp pad2_prev             ; Controller 2: previous frame buttons
+.globalzp pad2_pressed          ; Controller 2: newly pressed this frame
+
+; --- Player state ---
+.globalzp player_x              ; Player X position (pixels)
+.globalzp player_y              ; Player Y position (pixels)
+.globalzp player_dir            ; Player facing direction
+.globalzp player_speed          ; Player movement speed
+.globalzp player_anim_frame     ; Current animation frame
+.globalzp player_anim_timer     ; Animation timer countdown
+
+; --- PPU state ---
+.globalzp ppu_ctrl_shadow       ; Shadow copy of PPUCTRL
+.globalzp ppu_mask_shadow       ; Shadow copy of PPUMASK
+.globalzp scroll_x              ; Horizontal scroll position
+.globalzp scroll_y              ; Vertical scroll position
+
+; --- Sprite allocation ---
+.globalzp oam_offset            ; Next free OAM slot offset (0-255)
+
+; --- MMC3 bank shadows ---
+.globalzp current_prg_bank_0    ; Current PRG bank at $8000-$9FFF
+.globalzp current_prg_bank_1    ; Current PRG bank at $A000-$BFFF
+
+; ============================================================================
+; RAM Variables ($0300-$07FF)
+; ============================================================================
+
+; --- PPU write buffer (for deferred VRAM writes during NMI) ---
+.global ppu_buffer              ; PPU write buffer (64 bytes)
+.global ppu_buffer_len          ; Current length of buffered data
+
+; ============================================================================
+; Shared Subroutine Imports/Exports
+; ============================================================================
+
+; -- init.s --
+.global reset_handler
+
+; -- nmi.s --
+.global nmi_handler
+
+; -- vectors.s --
+.global irq_handler
+
+; -- main.s --
+.global main_loop
+
+; -- mmc3.s --
+.global switch_prg_bank_0
+.global switch_prg_bank_1
+.global switch_chr_2k_0
+.global switch_chr_2k_1
+.global switch_chr_1k_0
+.global switch_chr_1k_1
+.global switch_chr_1k_2
+.global switch_chr_1k_3
+.global set_mirroring
+.global init_mmc3
+
+; -- gamepad.s --
+.global read_gamepads
+
+; -- gfx/ppu.s --
+.global ppu_wait_vblank
+.global ppu_load_palette
+.global ppu_clear_nametable
+.global ppu_write_string
+.global ppu_buffer_write
+
+; -- gfx/sprites.s --
+.global clear_oam
+.global alloc_sprite
+.global push_sprite
+
+; -- data/palettes.s --
+.global default_palette
+
+.endif ; GLOBALS_INC

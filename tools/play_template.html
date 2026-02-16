@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zelda 2B - Build Preview</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #1a1a2e;
+      color: #e0e0e0;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #c8a42a;
+      font-size: 24px;
+      margin-bottom: 4px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      letter-spacing: 2px;
+    }
+
+    .build-info {
+      color: #888;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+
+    #emulator-container {
+      position: relative;
+      background: #000;
+      border: 3px solid #333;
+      border-radius: 4px;
+      box-shadow: 0 0 30px rgba(200, 164, 42, 0.15), 0 4px 20px rgba(0, 0, 0, 0.5);
+      margin-bottom: 20px;
+    }
+
+    #nes-canvas {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      width: 768px;
+      height: 720px;
+    }
+
+    #audio-btn {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(200, 164, 42, 0.9);
+      color: #1a1a2e;
+      border: none;
+      padding: 16px 32px;
+      font-size: 18px;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+      z-index: 10;
+      letter-spacing: 1px;
+    }
+
+    #audio-btn:hover {
+      background: rgba(220, 184, 52, 1);
+    }
+
+    #loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+
+    #loading-overlay .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #333;
+      border-top: 4px solid #c8a42a;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    #loading-overlay .label {
+      color: #c8a42a;
+      font-size: 14px;
+    }
+
+    #error-msg {
+      display: none;
+      color: #e74c3c;
+      background: rgba(231, 76, 60, 0.1);
+      border: 1px solid #e74c3c;
+      padding: 12px 20px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      max-width: 768px;
+      text-align: center;
+    }
+
+    .controls {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 16px 24px;
+      max-width: 768px;
+      width: 100%;
+    }
+
+    .controls h2 {
+      color: #c8a42a;
+      font-size: 14px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 32px;
+    }
+
+    .control-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+    }
+
+    .control-action {
+      color: #aaa;
+      font-size: 13px;
+    }
+
+    .control-key {
+      background: #2a2a3e;
+      color: #c8a42a;
+      padding: 3px 10px;
+      border-radius: 3px;
+      font-size: 12px;
+      border: 1px solid #444;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .footer {
+      margin-top: 20px;
+      color: #555;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+  <h1>ZELDA 2B</h1>
+  <div class="build-info">Build Preview</div>
+
+  <div id="error-msg"></div>
+
+  <div id="emulator-container">
+    <canvas id="nes-canvas" width="256" height="240"></canvas>
+    <button id="audio-btn">Click to Enable Audio</button>
+    <div id="loading-overlay">
+      <div class="spinner"></div>
+      <div class="label">Loading ROM...</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <h2>Controls</h2>
+    <div class="controls-grid">
+      <div class="control-row">
+        <span class="control-action">D-Pad</span>
+        <span class="control-key">Arrow Keys</span>
+      </div>
+      <div class="control-row">
+        <span class="control-action">A Button</span>
+        <span class="control-key">X</span>
+      </div>
+      <div class="control-row">
+        <span class="control-action">B Button</span>
+        <span class="control-key">Z</span>
+      </div>
+      <div class="control-row">
+        <span class="control-action">Start</span>
+        <span class="control-key">Enter</span>
+      </div>
+      <div class="control-row">
+        <span class="control-action">Select</span>
+        <span class="control-key">Shift</span>
+      </div>
+      <div class="control-row">
+        <span class="control-action">A (alt)</span>
+        <span class="control-key">S</span>
+      </div>
+      <div class="control-row">
+        <span class="control-action">B (alt)</span>
+        <span class="control-key">A</span>
+      </div>
+      <div class="control-row">
+        <span class="control-action">Fullscreen</span>
+        <span class="control-key">F</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Powered by JSNES | Click canvas to focus</div>
+
+  <!-- JSNES from CDN with fallback -->
+  <script>
+    // Load JSNES from CDN with fallback
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    async function loadJSNES() {
+      try {
+        await loadScript('https://cdn.jsdelivr.net/npm/jsnes@1.2.1/dist/jsnes.min.js');
+        return true;
+      } catch (e) {
+        console.warn('jsdelivr failed, trying unpkg...');
+      }
+      try {
+        await loadScript('https://unpkg.com/jsnes@1.2.1/dist/jsnes.min.js');
+        return true;
+      } catch (e) {
+        console.error('Failed to load JSNES from any CDN');
+      }
+      return false;
+    }
+
+    // =========================================================================
+    // NES Emulator Core
+    // =========================================================================
+
+    const SCREEN_WIDTH = 256;
+    const SCREEN_HEIGHT = 240;
+    const FRAMEBUFFER_SIZE = SCREEN_WIDTH * SCREEN_HEIGHT;
+
+    let canvas_ctx, image;
+    let framebuffer_u8, framebuffer_u32;
+
+    const AUDIO_BUFFERING = 512;
+    const SAMPLE_COUNT = 4 * 1024;
+    const SAMPLE_MASK = SAMPLE_COUNT - 1;
+    let audio_samples_L = new Float32Array(SAMPLE_COUNT);
+    let audio_samples_R = new Float32Array(SAMPLE_COUNT);
+    let audio_write_cursor = 0, audio_read_cursor = 0;
+    let audio_started = false;
+    let audio_ctx;
+    let nes;
+
+    function onAnimationFrame() {
+      window.requestAnimationFrame(onAnimationFrame);
+      if (!audio_started) {
+        nes.frame();
+      }
+      image.data.set(framebuffer_u8);
+      canvas_ctx.putImageData(image, 0, 0);
+    }
+
+    function audio_remain() {
+      return (audio_write_cursor - audio_read_cursor) & SAMPLE_MASK;
+    }
+
+    function audio_callback(event) {
+      let dst = event.outputBuffer;
+      let len = dst.length;
+      if (audio_remain() < AUDIO_BUFFERING) nes.frame();
+      let dst_l = dst.getChannelData(0);
+      let dst_r = dst.getChannelData(1);
+      for (let i = 0; i < len; i++) {
+        let src_idx = (audio_read_cursor + i) & SAMPLE_MASK;
+        dst_l[i] = audio_samples_L[src_idx];
+        dst_r[i] = audio_samples_R[src_idx];
+      }
+      audio_read_cursor = (audio_read_cursor + len) & SAMPLE_MASK;
+    }
+
+    // =========================================================================
+    // Keyboard Handling
+    // =========================================================================
+
+    function keyboard(callback, event) {
+      let player = 1;
+      let button = null;
+
+      switch (event.keyCode) {
+        case 38: // Up Arrow
+          button = jsnes.Controller.BUTTON_UP; break;
+        case 40: // Down Arrow
+          button = jsnes.Controller.BUTTON_DOWN; break;
+        case 37: // Left Arrow
+          button = jsnes.Controller.BUTTON_LEFT; break;
+        case 39: // Right Arrow
+          button = jsnes.Controller.BUTTON_RIGHT; break;
+        case 88: // X = A button
+          button = jsnes.Controller.BUTTON_A; break;
+        case 90: // Z = B button
+          button = jsnes.Controller.BUTTON_B; break;
+        case 13: // Enter = Start
+          button = jsnes.Controller.BUTTON_START; break;
+        case 16: // Shift = Select
+          button = jsnes.Controller.BUTTON_SELECT; break;
+        // Alt mappings
+        case 83: // S = A button (alt)
+          button = jsnes.Controller.BUTTON_A; break;
+        case 65: // A = B button (alt)
+          button = jsnes.Controller.BUTTON_B; break;
+        case 70: // F = toggle fullscreen
+          if (event.type === 'keydown') toggleFullscreen();
+          return;
+        default:
+          return; // Don't preventDefault for unmapped keys
+      }
+
+      if (button !== null) {
+        event.preventDefault();
+        callback(player, button);
+      }
+    }
+
+    function toggleFullscreen() {
+      let container = document.getElementById('emulator-container');
+      if (!document.fullscreenElement) {
+        container.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // =========================================================================
+    // Initialization
+    // =========================================================================
+
+    function nes_init() {
+      nes = new jsnes.NES({
+        onFrame: function(framebuffer_24) {
+          for (let i = 0; i < FRAMEBUFFER_SIZE; i++)
+            framebuffer_u32[i] = 0xFF000000 | framebuffer_24[i];
+        },
+        onAudioSample: function(l, r) {
+          audio_samples_L[audio_write_cursor] = l;
+          audio_samples_R[audio_write_cursor] = r;
+          audio_write_cursor = (audio_write_cursor + 1) & SAMPLE_MASK;
+        }
+      });
+
+      let canvas = document.getElementById('nes-canvas');
+      canvas_ctx = canvas.getContext('2d');
+      image = canvas_ctx.getImageData(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+      canvas_ctx.fillStyle = 'black';
+      canvas_ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+      // Allocate framebuffer
+      let buffer = new ArrayBuffer(image.data.length);
+      framebuffer_u8 = new Uint8ClampedArray(buffer);
+      framebuffer_u32 = new Uint32Array(buffer);
+
+      // Setup audio
+      audio_ctx = new (window.AudioContext || window.webkitAudioContext)();
+      let script_processor = audio_ctx.createScriptProcessor(AUDIO_BUFFERING, 0, 2);
+      script_processor.onaudioprocess = audio_callback;
+      script_processor.connect(audio_ctx.destination);
+
+      if (audio_ctx.state === 'suspended') {
+        document.getElementById('audio-btn').style.display = 'block';
+      } else {
+        audio_started = true;
+      }
+    }
+
+    function nes_boot(rom_data) {
+      nes.loadROM(rom_data);
+      window.requestAnimationFrame(onAnimationFrame);
+    }
+
+    // =========================================================================
+    // Base64 ROM Decoding
+    // =========================================================================
+
+    function base64ToRomString(base64) {
+      let binary = atob(base64);
+      return binary;
+    }
+
+    // =========================================================================
+    // Error Handling
+    // =========================================================================
+
+    function showError(msg) {
+      let el = document.getElementById('error-msg');
+      el.textContent = msg;
+      el.style.display = 'block';
+      let overlay = document.getElementById('loading-overlay');
+      if (overlay) overlay.style.display = 'none';
+    }
+
+    // =========================================================================
+    // Main Entry Point
+    // =========================================================================
+
+    document.addEventListener('keydown', (event) => {
+      if (nes) keyboard(nes.buttonDown.bind(nes), event);
+    });
+    document.addEventListener('keyup', (event) => {
+      if (nes) keyboard(nes.buttonUp.bind(nes), event);
+    });
+
+    // Audio resume button
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('audio-btn').addEventListener('click', () => {
+        audio_ctx.resume().then(() => {
+          audio_started = true;
+        });
+        document.getElementById('audio-btn').style.display = 'none';
+      });
+
+      // Click on canvas to resume audio too
+      document.getElementById('nes-canvas').addEventListener('click', () => {
+        if (audio_ctx && audio_ctx.state === 'suspended') {
+          audio_ctx.resume().then(() => {
+            audio_started = true;
+            document.getElementById('audio-btn').style.display = 'none';
+          });
+        }
+      });
+    });
+
+    // Boot sequence
+    (async function main() {
+      try {
+        let loaded = await loadJSNES();
+        if (!loaded) {
+          showError('Failed to load NES emulator library. Check your internet connection.');
+          return;
+        }
+
+        // The base64-encoded ROM data (replaced by make_preview.sh)
+        const ROM_BASE64 = 'PLACEHOLDER_ROM_BASE64';
+
+        if (ROM_BASE64.indexOf('PLACEHOLDER') === 0) {
+          showError('No ROM data embedded. Run make_preview.sh to generate a playable preview.');
+          return;
+        }
+
+        nes_init();
+
+        let romData = base64ToRomString(ROM_BASE64);
+        nes_boot(romData);
+
+        // Hide loading overlay
+        let overlay = document.getElementById('loading-overlay');
+        if (overlay) overlay.style.display = 'none';
+
+      } catch (e) {
+        showError('Error starting emulator: ' + e.message);
+        console.error(e);
+      }
+    })();
+  </script>
+</body>
+</html>
