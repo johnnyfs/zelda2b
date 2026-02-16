@@ -26,7 +26,7 @@ ROM     := $(BLDDIR)/zelda2b.nes
 PREVIEW := $(BLDDIR)/preview.html
 
 # Assembler flags
-ASFLAGS := -I $(INCDIR) -I $(SRCDIR) --cpu 6502
+ASFLAGS := -I $(INCDIR) -I $(SRCDIR) -I $(SRCDIR)/audio --cpu 6502
 
 # Source files (order matters for linking)
 SOURCES := \
@@ -41,8 +41,13 @@ SOURCES := \
 	$(SRCDIR)/gamepad.s \
 	$(SRCDIR)/gfx/ppu.s \
 	$(SRCDIR)/gfx/sprites.s \
+	$(SRCDIR)/map/map_engine.s \
+	$(SRCDIR)/map/map_transition.s \
 	$(SRCDIR)/data/palettes.s \
-	$(SRCDIR)/data/chr_data.s
+	$(SRCDIR)/data/metatiles.s \
+	$(SRCDIR)/data/map_screens.s \
+	$(SRCDIR)/data/chr_data.s \
+	$(SRCDIR)/audio/audio.s
 
 # CHR data assets (binary files included by chr_data.s)
 CHR_ASSETS := \
