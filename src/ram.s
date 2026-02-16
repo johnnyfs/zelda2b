@@ -39,12 +39,15 @@ pad2_prev:          .res 1      ; Controller 2: previous frame buttons
 pad2_pressed:       .res 1      ; Controller 2: newly pressed this frame
 
 ; --- Player state ---
-player_x:           .res 1      ; Player X position (pixels)
-player_y:           .res 1      ; Player Y position (pixels)
+player_x:           .res 1      ; Player X position (pixels, integer part)
+player_y:           .res 1      ; Player Y position (pixels, integer part)
+player_x_sub:       .res 1      ; Player X sub-pixel (fractional byte, 8.8 fixed)
+player_y_sub:       .res 1      ; Player Y sub-pixel (fractional byte, 8.8 fixed)
 player_dir:         .res 1      ; Player facing direction
-player_speed:       .res 1      ; Player movement speed
-player_anim_frame:  .res 1      ; Current animation frame
+player_speed:       .res 1      ; Player movement speed (legacy)
+player_anim_frame:  .res 1      ; Current animation frame (0 or 1)
 player_anim_timer:  .res 1      ; Animation timer countdown
+player_moving:      .res 1      ; Non-zero if player moved this frame
 
 ; --- PPU state ---
 ppu_ctrl_shadow:    .res 1      ; Shadow copy of PPUCTRL

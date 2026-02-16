@@ -39,12 +39,15 @@ GLOBALS_INC = 1
 .globalzp pad2_pressed          ; Controller 2: newly pressed this frame
 
 ; --- Player state ---
-.globalzp player_x              ; Player X position (pixels)
-.globalzp player_y              ; Player Y position (pixels)
+.globalzp player_x              ; Player X position (pixels, integer part)
+.globalzp player_y              ; Player Y position (pixels, integer part)
+.globalzp player_x_sub          ; Player X sub-pixel (fractional byte, 8.8 fixed)
+.globalzp player_y_sub          ; Player Y sub-pixel (fractional byte, 8.8 fixed)
 .globalzp player_dir            ; Player facing direction
-.globalzp player_speed          ; Player movement speed
-.globalzp player_anim_frame     ; Current animation frame
+.globalzp player_speed          ; Player movement speed (legacy)
+.globalzp player_anim_frame     ; Current animation frame (0 or 1)
 .globalzp player_anim_timer     ; Animation timer countdown
+.globalzp player_moving         ; Non-zero if player moved this frame
 
 ; --- PPU state ---
 .globalzp ppu_ctrl_shadow       ; Shadow copy of PPUCTRL
@@ -120,5 +123,16 @@ GLOBALS_INC = 1
 .global audio_stop_music
 .global audio_pause_music
 .global audio_play_sfx
+
+; -- player/player.s --
+.global player_init
+.global player_update
+.global player_draw
+
+; -- map/map_collision.s --
+.global check_collision
+
+; -- data/test_screen.s --
+.global load_test_screen
 
 .endif ; GLOBALS_INC

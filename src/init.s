@@ -86,29 +86,8 @@
     ; ----- Load initial palettes -----
     jsr ppu_load_palette
 
-    ; ----- Clear first nametable -----
-    jsr ppu_clear_nametable
-
-    ; ----- Write a test message to the screen -----
-    ; Write "ZELDA 2B" at row 13, column 12 (roughly center)
-    ; Nametable address = $2000 + (row * 32) + col = $2000 + (13*32) + 12 = $21AC
-    lda PPUSTATUS           ; Reset PPU address latch
-    lda #$21
-    sta PPUADDR
-    lda #$AC
-    sta PPUADDR
-    ; Write tile indices for "ZELDA 2B" using our CHR font
-    ; Font layout: A=$20, B=$21, ... Z=$39, 0=$3A, 1=$3B, 2=$3C
-    ; space=$44
-    ; Z=$39, E=$24, L=$2B, D=$23, A=$20, space=$44, 2=$3C, B=$21
-    ldx #$00
-@write_title:
-    lda title_text, x
-    beq @title_done
-    sta PPUDATA
-    inx
-    jmp @write_title
-@title_done:
+    ; ----- Load test screen nametable -----
+    jsr load_test_screen
 
     ; ----- Set initial scroll position -----
     lda PPUSTATUS           ; Reset address latch
@@ -134,4 +113,3 @@
     jmp main_loop
 .endproc
 
-    .byte 0                                         ; null terminator
