@@ -88,8 +88,8 @@
     lda ppu_ctrl_shadow
     sta PPUCTRL
 
-    ; --- Audio update stub ---
-    ; jsr audio_update      ; Future: call sound engine
+    ; --- Audio update ---
+    jsr audio_update        ; Update FamiStudio sound engine every frame
 
     ; --- Increment NMI counter ---
     inc nmi_counter

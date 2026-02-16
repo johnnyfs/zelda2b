@@ -9,6 +9,7 @@
 .include "mmc3.inc"
 .include "globals.inc"
 .include "enums.inc"
+.include "audio.inc"
 
 .segment "PRG_FIXED"
 
@@ -122,6 +123,9 @@
     sta PPUSCROLL           ; Y scroll = 0
     sta scroll_x
     sta scroll_y
+
+    ; ----- Initialize audio system -----
+    jsr audio_init          ; Set up FamiStudio engine with music + SFX data
 
     ; ----- Enable PPU rendering -----
     lda #PPUCTRL_NMI_ON | PPUCTRL_BG_0000 | PPUCTRL_SPR_1000
