@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sprite Sheet Selector - Zelda 2B</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Courier New', monospace;
+    background: #1a1a2e;
+    color: #eee;
+    padding: 20px;
+    min-height: 100vh;
+}
+h1 { color: #e94560; margin-bottom: 5px; font-size: 22px; }
+.subtitle { color: #888; font-size: 12px; margin-bottom: 15px; }
+
+/* Layout */
+.app-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+.main-panel { flex: 1; min-width: 0; }
+.side-panel { width: 340px; flex-shrink: 0; }
+
+/* Toolbar */
+.toolbar {
+    background: #16213e;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+.toolbar .group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.toolbar label {
+    font-size: 10px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.toolbar select, .toolbar input[type="file"], .toolbar button {
+    background: #0f3460;
+    color: #eee;
+    border: 1px solid #333;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+.toolbar select:hover, .toolbar button:hover {
+    border-color: #53aeff;
+}
+.toolbar button.primary {
+    background: #e94560;
+    border-color: #e94560;
+    font-weight: bold;
+}
+.toolbar button.primary:hover {
+    background: #ff6b81;
+}
+.toolbar .sep {
+    width: 1px;
+    height: 30px;
+    background: #333;
+    align-self: center;
+}
+
+/* Canvas area */
+.canvas-container {
+    background: #0a0a1a;
+    border: 2px solid #16213e;
+    border-radius: 8px;
+    overflow: auto;
+    position: relative;
+    max-height: 80vh;
+}
+.canvas-wrapper {
+    position: relative;
+    display: inline-block;
+}
+#sprite-canvas {
+    image-rendering: pixelated;
+    display: block;
+    cursor: crosshair;
+}
+#overlay-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+#interaction-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: crosshair;
+}
+
+/* Selection list */
+.side-panel h2 {
+    color: #53aeff;
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.side-panel h2 .count {
+    background: #0f3460;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+}
+.selection-list {
+    max-height: 50vh;
+    overflow-y: auto;
+    margin-bottom: 12px;
+}
+.selection-item {
+    background: #16213e;
+    border: 1px solid #222;
+    border-radius: 6px;
+    padding: 8px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+.selection-item:hover {
+    border-color: #53aeff;
+}
+.selection-item.active {
+    border-color: #e94560;
+    background: #1e2a4a;
+}
+.selection-item .preview-thumb {
+    width: 48px;
+    height: 48px;
+    background: #000;
+    border-radius: 4px;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+}
+.selection-item .info {
+    flex: 1;
+    min-width: 0;
+}
+.selection-item .name {
+    font-size: 12px;
+    font-weight: bold;
+    color: #e94560;
+    margin-bottom: 2px;
+}
+.selection-item .coords {
+    font-size: 10px;
+    color: #888;
+}
+.selection-item .label-input {
+    background: #0a0a1a;
+    border: 1px solid #333;
+    color: #eee;
+    font-family: inherit;
+    font-size: 11px;
+    padding: 2px 5px;
+    border-radius: 3px;
+    width: 100%;
+    margin-top: 3px;
+}
+.selection-item .delete-btn {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 4px;
+    line-height: 1;
+}
+.selection-item .delete-btn:hover {
+    color: #e94560;
+}
+
+/* Color picker for selection boxes */
+.color-row {
+    display: flex;
+    gap: 4px;
+    margin-top: 3px;
+}
+.color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid #555;
+    cursor: pointer;
+}
+.color-dot.active {
+    border: 2px solid #fff;
+}
+
+/* Export section */
+.export-section {
+    background: #16213e;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 12px;
+}
+.export-section h3 {
+    color: #53aeff;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+.export-textarea {
+    background: #0a0a1a;
+    color: #aaa;
+    border: 1px solid #333;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 10px;
+    width: 100%;
+    height: 120px;
+    padding: 8px;
+    resize: vertical;
+}
+.export-buttons {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+.export-buttons button {
+    background: #0f3460;
+    color: #eee;
+    border: 1px solid #333;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 11px;
+    cursor: pointer;
+}
+.export-buttons button:hover {
+    border-color: #53aeff;
+}
+
+/* Status bar */
+.status-bar {
+    background: #16213e;
+    padding: 6px 12px;
+    border-radius: 0 0 8px 8px;
+    font-size: 11px;
+    color: #666;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Grid snap indicator */
+.snap-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.snap-indicator .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #53aeff;
+}
+
+/* Prompt output section */
+.prompt-section {
+    background: #16213e;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 12px;
+}
+.prompt-section h3 {
+    color: #e94560;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+.prompt-output {
+    background: #0a0a1a;
+    color: #ddd;
+    border: 1px solid #333;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 11px;
+    width: 100%;
+    height: 160px;
+    padding: 8px;
+    resize: vertical;
+    white-space: pre-wrap;
+}
+.copy-btn {
+    background: #e94560 !important;
+    border-color: #e94560 !important;
+    font-weight: bold;
+}
+.copy-btn:hover {
+    background: #ff6b81 !important;
+}
+
+/* Instructions overlay */
+.instructions {
+    background: rgba(0,0,0,0.85);
+    border: 1px dashed #53aeff;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+    line-height: 1.8;
+}
+.instructions strong {
+    color: #53aeff;
+}
+.instructions .key {
+    display: inline-block;
+    background: #0f3460;
+    border: 1px solid #53aeff;
+    border-radius: 3px;
+    padding: 1px 6px;
+    font-size: 11px;
+    color: #eee;
+    margin: 0 2px;
+}
+
+/* Bundled sheet tabs */
+.sheet-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+.sheet-tab {
+    background: #16213e;
+    color: #888;
+    border: 1px solid #333;
+    padding: 6px 12px;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+}
+.sheet-tab.active {
+    background: #0f3460;
+    color: #53aeff;
+    border-color: #53aeff;
+    border-bottom-color: transparent;
+}
+.sheet-tab:hover { color: #eee; }
+</style>
+</head>
+<body>
+
+<h1>Sprite Sheet Selector</h1>
+<p class="subtitle">Zelda 2B &mdash; Draw boxes on sprite sheets to define tile regions. Export as operator prompt.</p>
+
+<div class="toolbar">
+    <div class="group">
+        <label>Source Sheet</label>
+        <select id="sheet-select">
+            <option value="__upload">Upload custom image...</option>
+        </select>
+    </div>
+    <div class="group">
+        <label>Upload</label>
+        <input type="file" id="file-input" accept="image/*">
+    </div>
+    <div class="sep"></div>
+    <div class="group">
+        <label>Grid Snap</label>
+        <select id="grid-snap">
+            <option value="1">Off (1px)</option>
+            <option value="8" selected>8px (tile)</option>
+            <option value="16">16px (metatile)</option>
+            <option value="32">32px</option>
+        </select>
+    </div>
+    <div class="group">
+        <label>Zoom</label>
+        <select id="zoom-level">
+            <option value="1">1x</option>
+            <option value="2" selected>2x</option>
+            <option value="3">3x</option>
+            <option value="4">4x</option>
+        </select>
+    </div>
+    <div class="group">
+        <label>Grid Lines</label>
+        <select id="grid-lines">
+            <option value="0">Off</option>
+            <option value="8" selected>8px</option>
+            <option value="16">16px</option>
+        </select>
+    </div>
+    <div class="sep"></div>
+    <div class="group" style="align-self: flex-end;">
+        <button onclick="clearAllSelections()" style="font-size:11px;">Clear All</button>
+    </div>
+    <div class="group" style="align-self: flex-end;">
+        <button onclick="undoLastSelection()" style="font-size:11px;">Undo</button>
+    </div>
+</div>
+
+<div class="sheet-tabs" id="sheet-tabs"></div>
+
+<div class="app-container">
+    <div class="main-panel">
+        <div class="canvas-container" id="canvas-container">
+            <div class="canvas-wrapper" id="canvas-wrapper">
+                <canvas id="sprite-canvas"></canvas>
+                <canvas id="overlay-canvas"></canvas>
+                <canvas id="interaction-canvas"></canvas>
+            </div>
+            <div class="instructions" id="instructions">
+                <p><strong>Load a sprite sheet to begin</strong></p>
+                <p>Select a bundled reference sheet above, or upload your own image.</p>
+                <p style="margin-top:10px;">
+                    <span class="key">Click + Drag</span> to draw selection boxes<br>
+                    <span class="key">Shift + Drag</span> to force square selection<br>
+                    <span class="key">Delete</span> or <span class="key">Backspace</span> to remove selected<br>
+                    <span class="key">Ctrl+Z</span> to undo
+                </p>
+            </div>
+        </div>
+        <div class="status-bar" id="status-bar">
+            <span id="status-left">No image loaded</span>
+            <span id="status-right">
+                <span class="snap-indicator"><span class="dot"></span> Snap: 8px</span>
+            </span>
+        </div>
+    </div>
+
+    <div class="side-panel">
+        <h2>Selections <span class="count" id="sel-count">0</span></h2>
+        <div class="selection-list" id="selection-list"></div>
+
+        <div class="prompt-section">
+            <h3>Operator Prompt Output</h3>
+            <textarea class="prompt-output" id="prompt-output" readonly placeholder="Draw selections on the sprite sheet, then click 'Generate Prompt' to create operator-ready output..."></textarea>
+            <div class="export-buttons">
+                <button class="copy-btn" onclick="generatePrompt()">Generate Prompt</button>
+                <button onclick="copyPrompt()">Copy to Clipboard</button>
+            </div>
+        </div>
+
+        <div class="export-section">
+            <h3>JSON Data</h3>
+            <textarea class="export-textarea" id="export-json" readonly></textarea>
+            <div class="export-buttons">
+                <button onclick="exportJSON()">Export JSON</button>
+                <button onclick="importJSON()">Import JSON</button>
+                <button onclick="copyJSON()">Copy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================================
+// State
+// ============================================================================
+const SELECTION_COLORS = [
+    '#e94560', '#53aeff', '#44d47e', '#ffc857',
+    '#b474ff', '#ff6b81', '#41c1cf', '#f8a535'
+];
+
+let state = {
+    image: null,
+    imageWidth: 0,
+    imageHeight: 0,
+    imageName: '',
+    selections: [],
+    activeSelectionIndex: -1,
+    nextColorIndex: 0,
+    zoom: 2,
+    gridSnap: 8,
+    gridLines: 8,
+    isDragging: false,
+    dragStart: null,
+    dragCurrent: null,
+};
+
+let undoStack = [];
+
+// ============================================================================
+// Bundled reference sheets
+// ============================================================================
+const BUNDLED_SHEETS = [
+    { name: 'Link Sprites', path: '../assets/reference/link_sprites.png' },
+    { name: 'Overworld Tileset', path: '../assets/reference/overworld_tileset.png' },
+    { name: 'Minor Enemies', path: '../assets/reference/minor_enemies.png' },
+    { name: 'Weapons/Items/HUD', path: '../assets/reference/weapons_items_hud.png' },
+];
+
+// ============================================================================
+// Canvas references
+// ============================================================================
+const spriteCanvas = document.getElementById('sprite-canvas');
+const overlayCanvas = document.getElementById('overlay-canvas');
+const interactionCanvas = document.getElementById('interaction-canvas');
+const spriteCtx = spriteCanvas.getContext('2d');
+const overlayCtx = overlayCanvas.getContext('2d');
+const interactionCtx = interactionCanvas.getContext('2d');
+
+// ============================================================================
+// Initialization
+// ============================================================================
+function init() {
+    // Populate sheet selector
+    const select = document.getElementById('sheet-select');
+    BUNDLED_SHEETS.forEach((sheet, i) => {
+        const opt = document.createElement('option');
+        opt.value = i.toString();
+        opt.textContent = sheet.name;
+        select.insertBefore(opt, select.firstChild);
+    });
+    select.value = '0';
+
+    // Build tabs
+    buildSheetTabs();
+
+    // Event listeners
+    select.addEventListener('change', onSheetChange);
+    document.getElementById('file-input').addEventListener('change', onFileUpload);
+    document.getElementById('grid-snap').addEventListener('change', (e) => {
+        state.gridSnap = parseInt(e.target.value);
+        updateStatusBar();
+    });
+    document.getElementById('zoom-level').addEventListener('change', (e) => {
+        state.zoom = parseInt(e.target.value);
+        redrawAll();
+    });
+    document.getElementById('grid-lines').addEventListener('change', (e) => {
+        state.gridLines = parseInt(e.target.value);
+        redrawOverlay();
+    });
+
+    // Canvas interaction
+    interactionCanvas.addEventListener('mousedown', onMouseDown);
+    interactionCanvas.addEventListener('mousemove', onMouseMove);
+    interactionCanvas.addEventListener('mouseup', onMouseUp);
+    interactionCanvas.addEventListener('mouseleave', onMouseUp);
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', onKeyDown);
+
+    // Load first bundled sheet
+    loadBundledSheet(0);
+}
+
+function buildSheetTabs() {
+    const tabBar = document.getElementById('sheet-tabs');
+    tabBar.innerHTML = '';
+    BUNDLED_SHEETS.forEach((sheet, i) => {
+        const tab = document.createElement('button');
+        tab.className = 'sheet-tab';
+        tab.textContent = sheet.name;
+        tab.dataset.index = i;
+        tab.addEventListener('click', () => {
+            loadBundledSheet(i);
+            document.getElementById('sheet-select').value = i.toString();
+        });
+        tabBar.appendChild(tab);
+    });
+}
+
+function updateSheetTabs(activeIndex) {
+    document.querySelectorAll('.sheet-tab').forEach((tab, i) => {
+        tab.classList.toggle('active', i === activeIndex);
+    });
+}
+
+// ============================================================================
+// Image loading
+// ============================================================================
+function loadBundledSheet(index) {
+    const sheet = BUNDLED_SHEETS[index];
+    const img = new Image();
+    img.onload = () => {
+        state.image = img;
+        state.imageWidth = img.naturalWidth;
+        state.imageHeight = img.naturalHeight;
+        state.imageName = sheet.name;
+        document.getElementById('instructions').style.display = 'none';
+        updateSheetTabs(index);
+        redrawAll();
+        updateStatusBar();
+    };
+    img.onerror = () => {
+        // Try alternate paths
+        const img2 = new Image();
+        img2.onload = () => {
+            state.image = img2;
+            state.imageWidth = img2.naturalWidth;
+            state.imageHeight = img2.naturalHeight;
+            state.imageName = sheet.name;
+            document.getElementById('instructions').style.display = 'none';
+            updateSheetTabs(index);
+            redrawAll();
+            updateStatusBar();
+        };
+        img2.onerror = () => {
+            alert(`Could not load: ${sheet.path}\nTry uploading the image manually.`);
+        };
+        // Try without ../
+        img2.src = sheet.path.replace('../', '');
+    };
+    img.src = sheet.path;
+}
+
+function onSheetChange(e) {
+    const val = e.target.value;
+    if (val === '__upload') {
+        document.getElementById('file-input').click();
+    } else {
+        loadBundledSheet(parseInt(val));
+    }
+}
+
+function onFileUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+            state.image = img;
+            state.imageWidth = img.naturalWidth;
+            state.imageHeight = img.naturalHeight;
+            state.imageName = file.name;
+            document.getElementById('instructions').style.display = 'none';
+            updateSheetTabs(-1); // deselect all tabs
+            redrawAll();
+            updateStatusBar();
+        };
+        img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// ============================================================================
+// Drawing
+// ============================================================================
+function redrawAll() {
+    if (!state.image) return;
+
+    const z = state.zoom;
+    const w = state.imageWidth * z;
+    const h = state.imageHeight * z;
+
+    // Resize all canvases
+    [spriteCanvas, overlayCanvas, interactionCanvas].forEach(c => {
+        c.width = w;
+        c.height = h;
+        c.style.width = w + 'px';
+        c.style.height = h + 'px';
+    });
+
+    // Draw source image
+    spriteCtx.imageSmoothingEnabled = false;
+    spriteCtx.drawImage(state.image, 0, 0, w, h);
+
+    // Draw overlay (grid + selections)
+    redrawOverlay();
+}
+
+function redrawOverlay() {
+    if (!state.image) return;
+
+    const z = state.zoom;
+    const w = state.imageWidth * z;
+    const h = state.imageHeight * z;
+
+    overlayCtx.clearRect(0, 0, w, h);
+
+    // Grid lines
+    if (state.gridLines > 0) {
+        const gridPx = state.gridLines * z;
+        overlayCtx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+        overlayCtx.lineWidth = 1;
+        for (let x = gridPx; x < w; x += gridPx) {
+            overlayCtx.beginPath();
+            overlayCtx.moveTo(x + 0.5, 0);
+            overlayCtx.lineTo(x + 0.5, h);
+            overlayCtx.stroke();
+        }
+        for (let y = gridPx; y < h; y += gridPx) {
+            overlayCtx.beginPath();
+            overlayCtx.moveTo(0, y + 0.5);
+            overlayCtx.lineTo(w, y + 0.5);
+            overlayCtx.stroke();
+        }
+    }
+
+    // Draw selections
+    state.selections.forEach((sel, i) => {
+        const isActive = i === state.activeSelectionIndex;
+        drawSelectionBox(overlayCtx, sel, z, isActive);
+    });
+
+    // Draw current drag
+    if (state.isDragging && state.dragStart && state.dragCurrent) {
+        const rect = computeRect(state.dragStart, state.dragCurrent);
+        overlayCtx.setLineDash([4, 4]);
+        overlayCtx.strokeStyle = SELECTION_COLORS[state.nextColorIndex % SELECTION_COLORS.length];
+        overlayCtx.lineWidth = 2;
+        overlayCtx.strokeRect(
+            rect.x * z + 0.5, rect.y * z + 0.5,
+            rect.w * z, rect.h * z
+        );
+        overlayCtx.setLineDash([]);
+
+        // Size label
+        overlayCtx.fillStyle = 'rgba(0,0,0,0.7)';
+        overlayCtx.font = '11px Courier New';
+        const label = `${rect.w}x${rect.h}`;
+        const tw = overlayCtx.measureText(label).width;
+        overlayCtx.fillRect(rect.x * z, rect.y * z - 16, tw + 6, 14);
+        overlayCtx.fillStyle = '#fff';
+        overlayCtx.fillText(label, rect.x * z + 3, rect.y * z - 4);
+    }
+
+    updateSelectionList();
+    updateExportJSON();
+}
+
+function drawSelectionBox(ctx, sel, zoom, isActive) {
+    const x = sel.x * zoom;
+    const y = sel.y * zoom;
+    const w = sel.w * zoom;
+    const h = sel.h * zoom;
+    const color = sel.color || SELECTION_COLORS[0];
+
+    // Fill
+    ctx.fillStyle = isActive
+        ? color + '40'
+        : color + '20';
+    ctx.fillRect(x, y, w, h);
+
+    // Border
+    ctx.strokeStyle = color;
+    ctx.lineWidth = isActive ? 3 : 2;
+    ctx.strokeRect(x + 0.5, y + 0.5, w, h);
+
+    // Label
+    if (sel.label || sel.index !== undefined) {
+        const text = sel.label || `#${sel.index}`;
+        ctx.font = 'bold 11px Courier New';
+        const tw = ctx.measureText(text).width;
+        const lx = x + 2;
+        const ly = y + h + 14;
+
+        ctx.fillStyle = 'rgba(0,0,0,0.8)';
+        ctx.fillRect(lx - 1, ly - 11, tw + 6, 14);
+        ctx.fillStyle = color;
+        ctx.fillText(text, lx + 2, ly);
+    }
+
+    // Corner handles for active
+    if (isActive) {
+        const hs = 5;
+        ctx.fillStyle = color;
+        [[x, y], [x + w, y], [x, y + h], [x + w, y + h]].forEach(([cx, cy]) => {
+            ctx.fillRect(cx - hs/2, cy - hs/2, hs, hs);
+        });
+    }
+}
+
+// ============================================================================
+// Mouse interaction
+// ============================================================================
+function getCanvasPos(e) {
+    const rect = interactionCanvas.getBoundingClientRect();
+    return {
+        x: Math.floor((e.clientX - rect.left) / state.zoom),
+        y: Math.floor((e.clientY - rect.top) / state.zoom)
+    };
+}
+
+function snapToGrid(val) {
+    if (state.gridSnap <= 1) return val;
+    return Math.round(val / state.gridSnap) * state.gridSnap;
+}
+
+function onMouseDown(e) {
+    if (!state.image) return;
+    if (e.button !== 0) return;
+
+    const pos = getCanvasPos(e);
+    const snapped = { x: snapToGrid(pos.x), y: snapToGrid(pos.y) };
+
+    // Check if clicking an existing selection
+    const clickedIdx = findSelectionAt(pos.x, pos.y);
+    if (clickedIdx >= 0 && !e.shiftKey) {
+        state.activeSelectionIndex = clickedIdx;
+        redrawOverlay();
+        return;
+    }
+
+    // Start new drag
+    state.isDragging = true;
+    state.dragStart = snapped;
+    state.dragCurrent = snapped;
+    state.activeSelectionIndex = -1;
+    updateStatusBar();
+}
+
+function onMouseMove(e) {
+    if (!state.image) return;
+
+    const pos = getCanvasPos(e);
+    const snapped = { x: snapToGrid(pos.x), y: snapToGrid(pos.y) };
+
+    // Update status bar with cursor position
+    document.getElementById('status-left').textContent =
+        `${state.imageName} (${state.imageWidth}x${state.imageHeight}) | Cursor: ${pos.x}, ${pos.y}`;
+
+    if (state.isDragging) {
+        if (e.shiftKey) {
+            // Force square
+            const dx = snapped.x - state.dragStart.x;
+            const dy = snapped.y - state.dragStart.y;
+            const size = Math.max(Math.abs(dx), Math.abs(dy));
+            state.dragCurrent = {
+                x: state.dragStart.x + (dx >= 0 ? size : -size),
+                y: state.dragStart.y + (dy >= 0 ? size : -size)
+            };
+        } else {
+            state.dragCurrent = snapped;
+        }
+        redrawOverlay();
+    }
+}
+
+function onMouseUp(e) {
+    if (!state.isDragging) return;
+    state.isDragging = false;
+
+    if (!state.dragStart || !state.dragCurrent) return;
+
+    const rect = computeRect(state.dragStart, state.dragCurrent);
+
+    // Minimum size check (at least 2px)
+    if (rect.w >= 2 && rect.h >= 2) {
+        saveUndo();
+        const sel = {
+            x: rect.x,
+            y: rect.y,
+            w: rect.w,
+            h: rect.h,
+            label: '',
+            color: SELECTION_COLORS[state.nextColorIndex % SELECTION_COLORS.length],
+            index: state.selections.length,
+            sheet: state.imageName,
+        };
+        state.selections.push(sel);
+        state.activeSelectionIndex = state.selections.length - 1;
+        state.nextColorIndex++;
+    }
+
+    state.dragStart = null;
+    state.dragCurrent = null;
+    redrawOverlay();
+}
+
+function findSelectionAt(x, y) {
+    // Find topmost selection containing point (search reverse order)
+    for (let i = state.selections.length - 1; i >= 0; i--) {
+        const s = state.selections[i];
+        if (x >= s.x && x < s.x + s.w && y >= s.y && y < s.y + s.h) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+function computeRect(p1, p2) {
+    const x = Math.min(p1.x, p2.x);
+    const y = Math.min(p1.y, p2.y);
+    const w = Math.abs(p2.x - p1.x);
+    const h = Math.abs(p2.y - p1.y);
+    return { x, y, w, h };
+}
+
+// ============================================================================
+// Keyboard shortcuts
+// ============================================================================
+function onKeyDown(e) {
+    // Delete / Backspace - remove active selection
+    if ((e.key === 'Delete' || e.key === 'Backspace') && state.activeSelectionIndex >= 0) {
+        // Don't delete if focused in input
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        saveUndo();
+        state.selections.splice(state.activeSelectionIndex, 1);
+        reindexSelections();
+        state.activeSelectionIndex = -1;
+        redrawOverlay();
+        e.preventDefault();
+    }
+
+    // Ctrl+Z - undo
+    if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+        undoLastSelection();
+        e.preventDefault();
+    }
+}
+
+// ============================================================================
+// Undo
+// ============================================================================
+function saveUndo() {
+    undoStack.push(JSON.parse(JSON.stringify(state.selections)));
+    if (undoStack.length > 50) undoStack.shift();
+}
+
+function undoLastSelection() {
+    if (undoStack.length === 0) return;
+    state.selections = undoStack.pop();
+    reindexSelections();
+    state.activeSelectionIndex = -1;
+    redrawOverlay();
+}
+
+function reindexSelections() {
+    state.selections.forEach((s, i) => s.index = i);
+}
+
+// ============================================================================
+// Selection list UI
+// ============================================================================
+function updateSelectionList() {
+    const list = document.getElementById('selection-list');
+    const count = document.getElementById('sel-count');
+    count.textContent = state.selections.length;
+
+    list.innerHTML = '';
+    state.selections.forEach((sel, i) => {
+        const item = document.createElement('div');
+        item.className = 'selection-item' + (i === state.activeSelectionIndex ? ' active' : '');
+        item.onclick = (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+            state.activeSelectionIndex = i;
+            redrawOverlay();
+        };
+
+        // Preview thumbnail
+        const thumb = document.createElement('canvas');
+        thumb.className = 'preview-thumb';
+        thumb.width = 48;
+        thumb.height = 48;
+        if (state.image) {
+            const tCtx = thumb.getContext('2d');
+            tCtx.imageSmoothingEnabled = false;
+            // Fit the selection into 48x48
+            const scale = Math.min(48 / sel.w, 48 / sel.h);
+            const dw = sel.w * scale;
+            const dh = sel.h * scale;
+            const dx = (48 - dw) / 2;
+            const dy = (48 - dh) / 2;
+            tCtx.fillStyle = '#000';
+            tCtx.fillRect(0, 0, 48, 48);
+            tCtx.drawImage(state.image, sel.x, sel.y, sel.w, sel.h, dx, dy, dw, dh);
+        }
+
+        // Info
+        const info = document.createElement('div');
+        info.className = 'info';
+
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'name';
+        nameDiv.textContent = sel.label || `Selection #${i}`;
+        nameDiv.style.color = sel.color;
+
+        const coordsDiv = document.createElement('div');
+        coordsDiv.className = 'coords';
+        coordsDiv.textContent = `(${sel.x}, ${sel.y}) ${sel.w}x${sel.h}px`;
+        if (sel.w % 8 === 0 && sel.h % 8 === 0) {
+            coordsDiv.textContent += ` = ${sel.w/8}x${sel.h/8} tiles`;
+        }
+
+        const labelInput = document.createElement('input');
+        labelInput.className = 'label-input';
+        labelInput.placeholder = 'Label this region...';
+        labelInput.value = sel.label || '';
+        labelInput.oninput = (e) => {
+            sel.label = e.target.value;
+            nameDiv.textContent = sel.label || `Selection #${i}`;
+            redrawOverlay();
+        };
+
+        // Color dots
+        const colorRow = document.createElement('div');
+        colorRow.className = 'color-row';
+        SELECTION_COLORS.forEach(c => {
+            const dot = document.createElement('div');
+            dot.className = 'color-dot' + (c === sel.color ? ' active' : '');
+            dot.style.backgroundColor = c;
+            dot.onclick = (e) => {
+                e.stopPropagation();
+                sel.color = c;
+                redrawOverlay();
+            };
+            colorRow.appendChild(dot);
+        });
+
+        // Delete button
+        const delBtn = document.createElement('button');
+        delBtn.className = 'delete-btn';
+        delBtn.innerHTML = '&times;';
+        delBtn.title = 'Remove selection';
+        delBtn.onclick = (e) => {
+            e.stopPropagation();
+            saveUndo();
+            state.selections.splice(i, 1);
+            reindexSelections();
+            if (state.activeSelectionIndex === i) state.activeSelectionIndex = -1;
+            else if (state.activeSelectionIndex > i) state.activeSelectionIndex--;
+            redrawOverlay();
+        };
+
+        info.appendChild(nameDiv);
+        info.appendChild(coordsDiv);
+        info.appendChild(labelInput);
+        info.appendChild(colorRow);
+
+        item.appendChild(thumb);
+        item.appendChild(info);
+        item.appendChild(delBtn);
+        list.appendChild(item);
+    });
+}
+
+// ============================================================================
+// Export / Import
+// ============================================================================
+function updateExportJSON() {
+    const data = {
+        sheet: state.imageName,
+        imageSize: { w: state.imageWidth, h: state.imageHeight },
+        selections: state.selections.map(s => ({
+            label: s.label,
+            x: s.x, y: s.y,
+            w: s.w, h: s.h,
+            tiles_w: s.w % 8 === 0 ? s.w / 8 : null,
+            tiles_h: s.h % 8 === 0 ? s.h / 8 : null,
+        }))
+    };
+    document.getElementById('export-json').value = JSON.stringify(data, null, 2);
+}
+
+function exportJSON() {
+    const json = document.getElementById('export-json').value;
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `sprite_selections_${state.imageName.replace(/\W+/g, '_')}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function importJSON() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const data = JSON.parse(ev.target.result);
+                if (data.selections && Array.isArray(data.selections)) {
+                    saveUndo();
+                    data.selections.forEach((s, i) => {
+                        state.selections.push({
+                            x: s.x, y: s.y, w: s.w, h: s.h,
+                            label: s.label || '',
+                            color: SELECTION_COLORS[(state.nextColorIndex + i) % SELECTION_COLORS.length],
+                            index: state.selections.length,
+                            sheet: data.sheet || state.imageName,
+                        });
+                    });
+                    state.nextColorIndex += data.selections.length;
+                    reindexSelections();
+                    redrawOverlay();
+                }
+            } catch (err) {
+                alert('Failed to parse JSON: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
+
+function copyJSON() {
+    const el = document.getElementById('export-json');
+    navigator.clipboard.writeText(el.value).then(() => {
+        el.style.borderColor = '#44d47e';
+        setTimeout(() => el.style.borderColor = '#333', 500);
+    });
+}
+
+// ============================================================================
+// Operator Prompt Generation
+// ============================================================================
+function generatePrompt() {
+    if (state.selections.length === 0) {
+        document.getElementById('prompt-output').value = '(No selections yet - draw boxes on the sprite sheet first)';
+        return;
+    }
+
+    let prompt = `SPRITE SHEET REFERENCE: "${state.imageName}" (${state.imageWidth}x${state.imageHeight}px)\n`;
+    prompt += `${'='.repeat(60)}\n\n`;
+    prompt += `The following regions have been selected from the sprite sheet.\n`;
+    prompt += `Coordinates are in pixels from top-left origin.\n`;
+    prompt += `Tile counts assume 8x8 NES tiles.\n\n`;
+
+    state.selections.forEach((sel, i) => {
+        const label = sel.label || `Region #${i}`;
+        const tilesW = sel.w % 8 === 0 ? sel.w / 8 : '?';
+        const tilesH = sel.h % 8 === 0 ? sel.h / 8 : '?';
+
+        prompt += `[${i + 1}] ${label}\n`;
+        prompt += `    Position: (${sel.x}, ${sel.y})\n`;
+        prompt += `    Size: ${sel.w}x${sel.h}px (${tilesW}x${tilesH} tiles)\n`;
+        prompt += `    Tile range: Row ${Math.floor(sel.y / 8)}-${Math.floor((sel.y + sel.h - 1) / 8)}, `;
+        prompt += `Col ${Math.floor(sel.x / 8)}-${Math.floor((sel.x + sel.w - 1) / 8)}\n`;
+
+        if (sel.w % 8 === 0 && sel.h % 8 === 0) {
+            // Calculate tile indices (assuming 16 tiles per row in CHR layout)
+            const startTileX = sel.x / 8;
+            const startTileY = sel.y / 8;
+            const tilesPerRow = 16; // Standard NES CHR layout
+            const startIdx = startTileY * tilesPerRow + startTileX;
+            prompt += `    CHR index (if 16-wide): $${startIdx.toString(16).padStart(2, '0').toUpperCase()}`;
+            prompt += ` (#${startIdx})\n`;
+        }
+        prompt += '\n';
+    });
+
+    prompt += `${'='.repeat(60)}\n`;
+    prompt += `Use these regions to assign CHR tile indices in the NES ROM.\n`;
+    prompt += `Each 8x8 pixel block = 1 tile (16 bytes in CHR format).\n`;
+    prompt += `Sprite tiles use the pattern: TL, TR, BL, BR for 16x16 sprites.\n`;
+
+    document.getElementById('prompt-output').value = prompt;
+}
+
+function copyPrompt() {
+    const el = document.getElementById('prompt-output');
+    navigator.clipboard.writeText(el.value).then(() => {
+        el.style.borderColor = '#44d47e';
+        setTimeout(() => el.style.borderColor = '#333', 500);
+    });
+}
+
+// ============================================================================
+// Status bar
+// ============================================================================
+function updateStatusBar() {
+    const left = document.getElementById('status-left');
+    if (state.image) {
+        left.textContent = `${state.imageName} (${state.imageWidth}x${state.imageHeight})`;
+    } else {
+        left.textContent = 'No image loaded';
+    }
+
+    const snap = state.gridSnap;
+    document.getElementById('status-right').innerHTML =
+        `<span class="snap-indicator"><span class="dot"></span> Snap: ${snap}px</span>`;
+}
+
+// ============================================================================
+// Selection management
+// ============================================================================
+function clearAllSelections() {
+    if (state.selections.length === 0) return;
+    if (!confirm(`Remove all ${state.selections.length} selections?`)) return;
+    saveUndo();
+    state.selections = [];
+    state.activeSelectionIndex = -1;
+    state.nextColorIndex = 0;
+    redrawOverlay();
+}
+
+// ============================================================================
+// Initialize on load
+// ============================================================================
+window.addEventListener('load', init);
+</script>
+</body>
+</html>
