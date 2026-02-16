@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Zelda 2B - HUD Status Bar Mockup v2</title>
+<style>
+  body { background: #1a1a2e; color: #e0e0e0; font-family: 'Courier New', monospace; margin: 20px; }
+  h1 { color: #ffd700; text-align: center; }
+  h2 { color: #88ccff; margin-top: 30px; }
+  .section { margin: 20px 0; padding: 15px; background: #16213e; border-radius: 8px; border: 1px solid #334; }
+  canvas { image-rendering: pixelated; image-rendering: crisp-edges; display: block; margin: 10px auto; border: 2px solid #555; }
+  .label { text-align: center; color: #aaa; font-size: 12px; margin: 5px 0; }
+  .palette-row { display: flex; gap: 10px; justify-content: center; margin: 10px 0; flex-wrap: wrap; }
+  .swatch { width: 40px; height: 40px; border: 2px solid #666; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; color: #fff; text-shadow: 1px 1px 2px #000; }
+  .note { color: #f88; font-size: 13px; text-align: center; margin: 5px; }
+  .change { color: #8f8; font-size: 13px; }
+  pre { font-size: 11px; color: #8f8; line-height: 1.3; overflow-x: auto; }
+</style>
+</head>
+<body>
+<h1>Zelda 2B - HUD Status Bar Mockup v2</h1>
+<p class="note">Revised: 4 tile rows (32px), text labels, A+B item boxes, rupee/key/bomb counters, half-heart support</p>
+
+<div class="section">
+  <h2>NES BG Palette 3 (HUD)</h2>
+  <div class="palette-row">
+    <div><div class="swatch" style="background:#000000;">$0F</div><div class="label">Black BG</div></div>
+    <div><div class="swatch" style="background:#545454;">$00</div><div class="label">Dark Gray</div></div>
+    <div><div class="swatch" style="background:#a8a8a8;">$10</div><div class="label">Light Gray</div></div>
+    <div><div class="swatch" style="background:#fcfcfc;">$30</div><div class="label">White</div></div>
+  </div>
+  <p class="label">All HUD elements use BG palette 3. Attribute table rows 0-1 forced to palette 3.</p>
+</div>
+
+<div class="section">
+  <h2>Layout (4 rows x 32 cols = 32px tall)</h2>
+  <pre>
+  |----- LIFE ------|  |-- ITEMS --|  |-- INVENTORY --|  |---- MAGIC ----|
+  Row 0: [_][L][I][F][E][_][_][_][_]  [_][B][TL][TR][_]  [x][0][5][_][_]  [_][M][A][G][I][C][_][_]
+  Row 1: [_][H][H][H][H][H][H][H][H]  [_][_][BL][BR][_]  [x][0][3][_][_]  [_][M][M][M][M][_][_][_]
+  Row 2: [_][_][_][_][_][_][_][_][_]  [_][A][TL][TR][_]  [x][0][2][_][_]  [_][_][_][_][_][_][_][_]
+  Row 3: [_][_][_][_][_][_][_][_][_]  [_][_][BL][BR][_]  [_][_][_][_][_]  [_][_][_][_][_][_][_][_]
+         col: 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+
+  L/I/F/E = "LIFE" text label          H = heart (full/half/empty)
+  B = "B" label, A = "A" label         TL/TR/BL/BR = item box frame
+  M/A/G/I/C = "MAGIC" text label       M = magic bottle (full/half/empty)
+  x = rupee/key/bomb icon              0-9 = count digits
+  </pre>
+</div>
+
+<div class="section">
+  <h2>1. Mid-Game State (6.5/8 hearts, 3.5/4 magic, inventory counts)</h2>
+  <canvas id="c1" width="768" height="288"></canvas>
+  <p class="label">6 full hearts + 1 half heart + 1 empty = 6.5/8 HP. 3 full + 1 half magic. Rupees:05 Keys:03 Bombs:02</p>
+</div>
+
+<div class="section">
+  <h2>2. Game Start (3/3 hearts, 0/4 magic, no items)</h2>
+  <canvas id="c2" width="768" height="288"></canvas>
+  <p class="label">Starting state: 3 full hearts, 4 empty magic bottles, 00 rupees/keys/bombs</p>
+</div>
+
+<div class="section">
+  <h2>3. Late Game (7/8 hearts, 4/4 magic, loaded inventory)</h2>
+  <canvas id="c3" width="768" height="288"></canvas>
+</div>
+
+<div class="section">
+  <h2>4. Full Screen Context (HUD + Game Area)</h2>
+  <canvas id="c4" width="768" height="720"></canvas>
+  <p class="label">256x240 NES screen at 3x. Top 32px = HUD (4 tile rows), remaining 208px = game area (13 metatile rows).</p>
+  <p class="note">Map area shrinks from 14 to 13 metatile rows (224px to 208px). Trade-off: richer HUD vs slightly less visible map.</p>
+</div>
+
+<script>
+const PAL = {
+  bg:      '#000000',  // $0F
+  dark:    '#545454',  // $00
+  medium:  '#a8a8a8',  // $10
+  light:   '#fcfcfc',  // $30
+  grass1:  '#004400',
+  grass2:  '#006600',
+  grass3:  '#00aa00',
+};
+
+const SCALE = 3;
+const TILE = 8;
+const T = TILE * SCALE;
+const HUD_ROWS = 4;
+
+function drawTile(ctx, tx, ty, pixels) {
+  for (let py = 0; py < 8; py++) {
+    for (let px = 0; px < 8; px++) {
+      const ci = pixels[py * 8 + px];
+      let color;
+      if (ci === 0) color = PAL.bg;
+      else if (ci === 1) color = PAL.dark;
+      else if (ci === 2) color = PAL.medium;
+      else color = PAL.light;
+      ctx.fillStyle = color;
+      ctx.fillRect((tx * TILE + px) * SCALE, (ty * TILE + py) * SCALE, SCALE, SCALE);
+    }
+  }
+}
+
+// ===== TILE DEFINITIONS =====
+
+const BLANK = new Array(64).fill(0);
+
+// Heart filled
+const HEART_FULL = [
+  0,0,0,0,0,0,0,0,
+  0,1,2,0,1,2,0,0,
+  1,2,3,2,2,3,2,0,
+  1,2,2,2,2,2,2,0,
+  1,2,2,2,2,2,2,0,
+  0,1,2,2,2,2,0,0,
+  0,0,1,2,2,0,0,0,
+  0,0,0,1,0,0,0,0,
+];
+
+// Heart half (left filled, right empty)
+const HEART_HALF = [
+  0,0,0,0,0,0,0,0,
+  0,1,2,0,1,1,0,0,
+  1,2,3,2,0,0,1,0,
+  1,2,2,2,0,0,1,0,
+  1,2,2,0,0,0,1,0,
+  0,1,2,0,0,1,0,0,
+  0,0,1,0,1,0,0,0,
+  0,0,0,1,0,0,0,0,
+];
+
+// Heart empty
+const HEART_EMPTY = [
+  0,0,0,0,0,0,0,0,
+  0,1,1,0,1,1,0,0,
+  1,0,0,1,0,0,1,0,
+  1,0,0,0,0,0,1,0,
+  1,0,0,0,0,0,1,0,
+  0,1,0,0,0,1,0,0,
+  0,0,1,0,1,0,0,0,
+  0,0,0,1,0,0,0,0,
+];
+
+// Magic bottle full (blue-toned via palette - uses color 2 = medium)
+const MAGIC_FULL = [
+  0,0,1,1,1,1,0,0,
+  0,0,1,3,3,1,0,0,
+  0,0,0,1,1,0,0,0,
+  0,0,1,2,2,1,0,0,
+  0,1,2,2,2,2,1,0,
+  0,1,2,3,2,2,1,0,
+  0,1,2,2,2,2,1,0,
+  0,0,1,1,1,1,0,0,
+];
+
+// Magic bottle half (top empty, bottom filled)
+const MAGIC_HALF = [
+  0,0,1,1,1,1,0,0,
+  0,0,1,3,3,1,0,0,
+  0,0,0,1,1,0,0,0,
+  0,0,1,0,0,1,0,0,
+  0,1,0,0,0,0,1,0,
+  0,1,2,2,2,2,1,0,
+  0,1,2,3,2,2,1,0,
+  0,0,1,1,1,1,0,0,
+];
+
+// Magic bottle empty
+const MAGIC_EMPTY = [
+  0,0,1,1,1,1,0,0,
+  0,0,1,3,3,1,0,0,
+  0,0,0,1,1,0,0,0,
+  0,0,1,0,0,1,0,0,
+  0,1,0,0,0,0,1,0,
+  0,1,0,0,0,0,1,0,
+  0,1,0,0,0,0,1,0,
+  0,0,1,1,1,1,0,0,
+];
+
+// Item box frame tiles
+const BOX_TL = [
+  3,3,3,3,3,3,3,3,
+  3,0,0,0,0,0,0,0,
+  3,0,0,0,0,0,0,0,
+  3,0,0,0,0,0,0,0,
+  3,0,0,0,0,0,0,0,
+  3,0,0,0,0,0,0,0,
+  3,0,0,0,0,0,0,0,
+  3,0,0,0,0,0,0,0,
+];
+const BOX_TR = [
+  3,3,3,3,3,3,3,1,
+  0,0,0,0,0,0,0,1,
+  0,0,0,0,0,0,0,1,
+  0,0,0,0,0,0,0,1,
+  0,0,0,0,0,0,0,1,
+  0,0,0,0,0,0,0,1,
+  0,0,0,0,0,0,0,1,
+  0,0,0,0,0,0,0,1,
+];
+const BOX_BL = [
+  3,0,0,0,0,0,0,0,
+  3,0,0,0,0,0,0,0,
+  3,0,0,0,0,0,0,0,
+  3,0,0,0,0,0,0,0,
+  3,0,0,0,0,0,0,0,
+  3,0,0,0,0,0,0,0,
+  3,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,
+];
+const BOX_BR = [
+  0,0,0,0,0,0,0,1,
+  0,0,0,0,0,0,0,1,
+  0,0,0,0,0,0,0,1,
+  0,0,0,0,0,0,0,1,
+  0,0,0,0,0,0,0,1,
+  0,0,0,0,0,0,0,1,
+  1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,
+];
+
+// Rupee icon (small diamond)
+const ICON_RUPEE = [
+  0,0,0,2,0,0,0,0,
+  0,0,2,3,2,0,0,0,
+  0,2,3,2,3,2,0,0,
+  0,2,3,2,3,2,0,0,
+  0,2,2,3,2,2,0,0,
+  0,0,2,2,2,0,0,0,
+  0,0,0,2,0,0,0,0,
+  0,0,0,0,0,0,0,0,
+];
+
+// Key icon
+const ICON_KEY = [
+  0,0,1,1,1,0,0,0,
+  0,1,0,0,0,1,0,0,
+  0,1,0,0,0,1,0,0,
+  0,0,1,1,2,0,0,0,
+  0,0,0,2,0,0,0,0,
+  0,0,0,2,2,0,0,0,
+  0,0,0,2,0,0,0,0,
+  0,0,0,2,2,0,0,0,
+];
+
+// Bomb icon
+const ICON_BOMB = [
+  0,0,0,0,3,0,0,0,
+  0,0,0,3,0,0,0,0,
+  0,0,1,1,1,0,0,0,
+  0,1,2,2,2,1,0,0,
+  0,1,2,3,2,1,0,0,
+  0,1,2,2,2,1,0,0,
+  0,0,1,1,1,0,0,0,
+  0,0,0,0,0,0,0,0,
+];
+
+// ===== FONT (5x7 within 8x8, using color 3 = white) =====
+// Minimal pixel font for HUD text
+function makeChar(rows) {
+  const tile = new Array(64).fill(0);
+  for (let y = 0; y < rows.length; y++) {
+    for (let x = 0; x < 8; x++) {
+      if (rows[y] & (1 << (7 - x))) {
+        tile[(y + 1) * 8 + x] = 3; // white
+      }
+    }
+  }
+  return tile;
+}
+
+const FONT = {
+  'L': makeChar([0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b11110000, 0b00000000]),
+  'I': makeChar([0b11100000, 0b01000000, 0b01000000, 0b01000000, 0b01000000, 0b11100000, 0b00000000]),
+  'F': makeChar([0b11110000, 0b10000000, 0b11100000, 0b10000000, 0b10000000, 0b10000000, 0b00000000]),
+  'E': makeChar([0b11110000, 0b10000000, 0b11100000, 0b10000000, 0b10000000, 0b11110000, 0b00000000]),
+  'M': makeChar([0b10001000, 0b11011000, 0b10101000, 0b10001000, 0b10001000, 0b10001000, 0b00000000]),
+  'A': makeChar([0b01100000, 0b10010000, 0b10010000, 0b11110000, 0b10010000, 0b10010000, 0b00000000]),
+  'G': makeChar([0b01110000, 0b10000000, 0b10000000, 0b10110000, 0b10010000, 0b01110000, 0b00000000]),
+  'C': makeChar([0b01110000, 0b10000000, 0b10000000, 0b10000000, 0b10000000, 0b01110000, 0b00000000]),
+  'B': makeChar([0b11100000, 0b10010000, 0b11100000, 0b10010000, 0b10010000, 0b11100000, 0b00000000]),
+  '0': makeChar([0b01100000, 0b10010000, 0b10010000, 0b10010000, 0b10010000, 0b01100000, 0b00000000]),
+  '1': makeChar([0b01000000, 0b11000000, 0b01000000, 0b01000000, 0b01000000, 0b11100000, 0b00000000]),
+  '2': makeChar([0b01100000, 0b10010000, 0b00010000, 0b01100000, 0b10000000, 0b11110000, 0b00000000]),
+  '3': makeChar([0b11100000, 0b00010000, 0b01100000, 0b00010000, 0b00010000, 0b11100000, 0b00000000]),
+  '4': makeChar([0b10010000, 0b10010000, 0b11110000, 0b00010000, 0b00010000, 0b00010000, 0b00000000]),
+  '5': makeChar([0b11110000, 0b10000000, 0b11100000, 0b00010000, 0b00010000, 0b11100000, 0b00000000]),
+  '6': makeChar([0b01100000, 0b10000000, 0b11100000, 0b10010000, 0b10010000, 0b01100000, 0b00000000]),
+  '7': makeChar([0b11110000, 0b00010000, 0b00100000, 0b01000000, 0b01000000, 0b01000000, 0b00000000]),
+  '8': makeChar([0b01100000, 0b10010000, 0b01100000, 0b10010000, 0b10010000, 0b01100000, 0b00000000]),
+  '9': makeChar([0b01100000, 0b10010000, 0b10010000, 0b01110000, 0b00010000, 0b01100000, 0b00000000]),
+  'x': makeChar([0b00000000, 0b00000000, 0b10010000, 0b01100000, 0b01100000, 0b10010000, 0b00000000]),
+  '-': makeChar([0b00000000, 0b00000000, 0b00000000, 0b11110000, 0b00000000, 0b00000000, 0b00000000]),
+};
+
+function drawText(ctx, tx, ty, str) {
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i];
+    if (ch === ' ') { drawTile(ctx, tx + i, ty, BLANK); continue; }
+    const tile = FONT[ch];
+    if (tile) drawTile(ctx, tx + i, ty, tile);
+    else drawTile(ctx, tx + i, ty, BLANK);
+  }
+}
+
+// ===== DRAW HUD (4-row version) =====
+// Layout:
+//   Row 0: "LIFE" label (cols 1-4) | "B" label (col 10) + B-box top (11-12) | inv icons+counts (15-17) | "MAGIC" label (cols 24-28)
+//   Row 1: Hearts (cols 1-8)       | B-box bottom (11-12)                   | inv icons+counts (15-17) | Magic bottles (cols 24-27)
+//   Row 2: (empty below hearts)    | "A" label (col 10) + A-box top (11-12) | inv icons+counts (15-17) | (empty)
+//   Row 3: separator line          | A-box bottom (11-12)                   | (empty)                  | separator
+
+function drawHUD(ctx, opts) {
+  const y0 = opts.yOff || 0;
+  const fh = opts.filledHearts || 0;   // full hearts
+  const hh = opts.halfHeart || false;  // has half heart after full ones
+  const th = opts.totalHearts || 8;    // total heart containers
+  const fm = opts.filledMagic || 0;    // full magic bottles
+  const hm = opts.halfMagic || false;  // has half magic after full ones
+  const tm = opts.totalMagic || 4;     // total magic bottles
+  const rupees = opts.rupees || 0;
+  const keys = opts.keys || 0;
+  const bombs = opts.bombs || 0;
+
+  // Clear all 4 rows to black first
+  for (let r = 0; r < 4; r++) {
+    for (let c = 0; c < 32; c++) {
+      drawTile(ctx, c, y0 + r, BLANK);
+    }
+  }
+
+  // === ROW 0 ===
+  // "LIFE" label (cols 1-4)
+  drawText(ctx, 1, y0, 'LIFE');
+
+  // "B" label (col 10), B-item box top (cols 11-12)
+  drawText(ctx, 10, y0, 'B');
+  drawTile(ctx, 11, y0, BOX_TL);
+  drawTile(ctx, 12, y0, BOX_TR);
+
+  // Inventory: rupee icon + count (cols 15-17)
+  drawTile(ctx, 15, y0, ICON_RUPEE);
+  drawText(ctx, 16, y0, String(rupees).padStart(2, '0'));
+
+  // "MAGIC" label (cols 24-28)
+  drawText(ctx, 24, y0, 'MAGIC');
+
+  // === ROW 1 ===
+  // Hearts (cols 1-8)
+  for (let i = 0; i < 8; i++) {
+    let tile;
+    if (i < fh) {
+      tile = HEART_FULL;
+    } else if (i === fh && hh) {
+      tile = HEART_HALF;
+    } else if (i < th) {
+      tile = HEART_EMPTY;
+    } else {
+      tile = BLANK;
+    }
+    drawTile(ctx, 1 + i, y0 + 1, tile);
+  }
+
+  // B-item box bottom (cols 11-12)
+  drawTile(ctx, 11, y0 + 1, BOX_BL);
+  drawTile(ctx, 12, y0 + 1, BOX_BR);
+
+  // Inventory: key icon + count (cols 15-17)
+  drawTile(ctx, 15, y0 + 1, ICON_KEY);
+  drawText(ctx, 16, y0 + 1, String(keys).padStart(2, '0'));
+
+  // Magic bottles (cols 24-27)
+  for (let i = 0; i < 4; i++) {
+    let tile;
+    if (i < fm) {
+      tile = MAGIC_FULL;
+    } else if (i === fm && hm) {
+      tile = MAGIC_HALF;
+    } else if (i < tm) {
+      tile = MAGIC_EMPTY;
+    } else {
+      tile = BLANK;
+    }
+    drawTile(ctx, 24 + i, y0 + 1, tile);
+  }
+
+  // === ROW 2 ===
+  // "A" label (col 10), A-item box top (cols 11-12)
+  drawText(ctx, 10, y0 + 2, 'A');
+  drawTile(ctx, 11, y0 + 2, BOX_TL);
+  drawTile(ctx, 12, y0 + 2, BOX_TR);
+
+  // Inventory: bomb icon + count (cols 15-17)
+  drawTile(ctx, 15, y0 + 2, ICON_BOMB);
+  drawText(ctx, 16, y0 + 2, String(bombs).padStart(2, '0'));
+
+  // === ROW 3 ===
+  // A-item box bottom (cols 11-12)
+  drawTile(ctx, 11, y0 + 3, BOX_BL);
+  drawTile(ctx, 12, y0 + 3, BOX_BR);
+
+  // Thin separator line at bottom of row 3 (1px dark gray)
+  const sepY = (y0 + 4) * TILE * SCALE - SCALE;
+  ctx.fillStyle = PAL.dark;
+  ctx.fillRect(0, sepY, 32 * T, SCALE);
+}
+
+function drawGameArea(ctx, yOff, rows) {
+  for (let ty = 0; ty < rows * 2; ty++) {
+    for (let tx = 0; tx < 32; tx++) {
+      const shade = ((tx + ty) % 2 === 0) ? PAL.grass2 : PAL.grass3;
+      ctx.fillStyle = shade;
+      ctx.fillRect(tx * T, (yOff + ty) * T, T, T);
+      ctx.fillStyle = PAL.grass1;
+      ctx.fillRect(tx * T, (yOff + ty) * T, 1, T);
+      ctx.fillRect(tx * T, (yOff + ty) * T, T, 1);
+    }
+  }
+  ctx.fillStyle = '#fff';
+  ctx.font = '16px Courier New';
+  ctx.textAlign = 'center';
+  ctx.fillText('GAME AREA (256 x 208 px)', 768/2, (yOff * T) + rows * T);
+  ctx.fillText(rows + ' metatile rows', 768/2, (yOff * T) + rows * T + 20);
+}
+
+// ===== RENDER CANVASES =====
+
+// Canvas 1: Mid-game (6.5/8 hearts, 3.5/4 magic)
+const c1 = document.getElementById('c1').getContext('2d');
+c1.fillStyle = PAL.bg;
+c1.fillRect(0, 0, 768, 288);
+drawHUD(c1, { filledHearts: 6, halfHeart: true, totalHearts: 8,
+              filledMagic: 3, halfMagic: true, totalMagic: 4,
+              rupees: 5, keys: 3, bombs: 2 });
+
+// Canvas 2: Game start (3/3 hearts, 0/4 magic)
+const c2 = document.getElementById('c2').getContext('2d');
+c2.fillStyle = PAL.bg;
+c2.fillRect(0, 0, 768, 288);
+drawHUD(c2, { filledHearts: 3, halfHeart: false, totalHearts: 3,
+              filledMagic: 0, halfMagic: false, totalMagic: 4,
+              rupees: 0, keys: 0, bombs: 0 });
+
+// Canvas 3: Late game (7/8 hearts, 4/4 magic, loaded)
+const c3 = document.getElementById('c3').getContext('2d');
+c3.fillStyle = PAL.bg;
+c3.fillRect(0, 0, 768, 288);
+drawHUD(c3, { filledHearts: 7, halfHeart: false, totalHearts: 8,
+              filledMagic: 4, halfMagic: false, totalMagic: 4,
+              rupees: 99, keys: 9, bombs: 8 });
+
+// Canvas 4: Full screen context
+const c4 = document.getElementById('c4').getContext('2d');
+c4.fillStyle = PAL.bg;
+c4.fillRect(0, 0, 768, 720);
+drawHUD(c4, { filledHearts: 6, halfHeart: true, totalHearts: 8,
+              filledMagic: 3, halfMagic: true, totalMagic: 4,
+              rupees: 5, keys: 3, bombs: 2 });
+drawGameArea(c4, 4, 13); // 13 metatile rows below 4-row HUD
+</script>
+</body>
+</html>
