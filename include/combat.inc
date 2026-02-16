@@ -53,6 +53,22 @@ DAMAGE_FROM_ENEMY       = 1     ; Damage per enemy contact
 SWORD_HITBOX_W          = 12    ; Sword hitbox width
 SWORD_HITBOX_H          = 12    ; Sword hitbox height
 
+; Sword sprite tiles (placeholder - vertical and horizontal blade)
+; Uses 2 tiles: one for up/down (vertical blade), one for left/right (horizontal)
+; These are single 8x8 sprites drawn alongside the player during attack state.
+SWORD_TILE_VERT         = $2D   ; Vertical sword blade (for up/down attacks)
+SWORD_TILE_HORIZ        = $2E   ; Horizontal sword blade (for left/right attacks)
+
+; Sword sprite offsets from player position (pixels)
+SWORD_OFFSET_UP_X       = 4     ; Centered on player (16px sprite, sword is 8px)
+SWORD_OFFSET_UP_Y       = -10   ; Above player
+SWORD_OFFSET_DOWN_X     = 4     ; Centered on player
+SWORD_OFFSET_DOWN_Y     = 16    ; Below player
+SWORD_OFFSET_LEFT_X     = -10   ; Left of player
+SWORD_OFFSET_LEFT_Y     = 4     ; Centered vertically
+SWORD_OFFSET_RIGHT_X    = 16    ; Right of player
+SWORD_OFFSET_RIGHT_Y    = 4     ; Centered vertically
+
 ; ============================================================================
 ; Enemy Zero-Page Variable Declarations
 ; ============================================================================

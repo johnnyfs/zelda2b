@@ -284,7 +284,154 @@ SCREEN_RIGHT        = 240
     inx
     stx oam_offset
 
+    ; --- Draw sword sprite if attacking ---
+    lda player_state
+    cmp #PLAYER_STATE_ATTACK
+    bne @skip_draw
+    jsr draw_sword_sprite
+
 @skip_draw:
+    rts
+.endproc
+
+; ============================================================================
+; draw_sword_sprite - Draw sword extending from player during attack
+; ============================================================================
+; Called from player_draw when player_state == PLAYER_STATE_ATTACK.
+; Draws a single 8x8 sprite in the facing direction offset from the player.
+; Sword flashes on alternating frames for visual pop.
+; Clobbers: A, X
+; ============================================================================
+
+.proc draw_sword_sprite
+    ; Flash the sword on alternating frames for visual feedback
+    lda frame_counter
+    and #$01
+    beq @draw_it
+    ; Odd frames: draw with brighter palette (alternate flash)
+    ; We still draw, just swap palette for flicker effect
+
+@draw_it:
+    ldx oam_offset
+
+    ; Determine sword position and tile based on player_dir
+    lda player_dir
+    cmp #DIR_UP
+    beq @sword_up
+    cmp #DIR_DOWN
+    beq @sword_down
+    cmp #DIR_LEFT
+    beq @sword_left
+    ; Default: DIR_RIGHT
+    jmp @sword_right
+
+@sword_up:
+    ; Y position: player_y + SWORD_OFFSET_UP_Y (negative = subtract)
+    lda player_y
+    sec
+    sbc #10                     ; 10 pixels above player top
+    sta $0200, x                ; OAM Y
+    inx
+    lda #SWORD_TILE_VERT        ; Vertical blade tile
+    sta $0200, x                ; OAM tile
+    inx
+    ; Attribute: palette 0 (player palette), no flip
+    lda frame_counter
+    and #$01
+    beq @up_pal0
+    lda #OAM_PALETTE_3          ; Bright flash frame
+    jmp @up_attr
+@up_pal0:
+    lda #OAM_PALETTE_0          ; Normal frame
+@up_attr:
+    sta $0200, x                ; OAM attribute
+    inx
+    lda player_x
+    clc
+    adc #4                      ; Center horizontally
+    sta $0200, x                ; OAM X
+    inx
+    jmp @done
+
+@sword_down:
+    lda player_y
+    clc
+    adc #16                     ; Below player bottom
+    sta $0200, x
+    inx
+    lda #SWORD_TILE_VERT
+    sta $0200, x
+    inx
+    lda frame_counter
+    and #$01
+    beq @down_pal0
+    lda #(OAM_PALETTE_3 | OAM_FLIP_V)  ; Flash + flip vertical
+    jmp @down_attr
+@down_pal0:
+    lda #(OAM_PALETTE_0 | OAM_FLIP_V)  ; Normal + flip vertical
+@down_attr:
+    sta $0200, x
+    inx
+    lda player_x
+    clc
+    adc #4
+    sta $0200, x
+    inx
+    jmp @done
+
+@sword_left:
+    lda player_y
+    clc
+    adc #4                      ; Center vertically
+    sta $0200, x
+    inx
+    lda #SWORD_TILE_HORIZ
+    sta $0200, x
+    inx
+    lda frame_counter
+    and #$01
+    beq @left_pal0
+    lda #OAM_PALETTE_3          ; Flash frame
+    jmp @left_attr
+@left_pal0:
+    lda #OAM_PALETTE_0          ; Normal
+@left_attr:
+    sta $0200, x
+    inx
+    lda player_x
+    sec
+    sbc #10                     ; Left of player
+    sta $0200, x
+    inx
+    jmp @done
+
+@sword_right:
+    lda player_y
+    clc
+    adc #4                      ; Center vertically
+    sta $0200, x
+    inx
+    lda #SWORD_TILE_HORIZ
+    sta $0200, x
+    inx
+    lda frame_counter
+    and #$01
+    beq @right_pal0
+    lda #(OAM_PALETTE_3 | OAM_FLIP_H)  ; Flash + flip horizontal
+    jmp @right_attr
+@right_pal0:
+    lda #(OAM_PALETTE_0 | OAM_FLIP_H)  ; Normal + flip horizontal
+@right_attr:
+    sta $0200, x
+    inx
+    lda player_x
+    clc
+    adc #16                     ; Right of player
+    sta $0200, x
+    inx
+
+@done:
+    stx oam_offset
     rts
 .endproc
 
