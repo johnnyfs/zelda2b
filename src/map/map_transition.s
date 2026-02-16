@@ -13,16 +13,17 @@
 .include "map.inc"
 
 ; Screen edge thresholds (pixel coordinates)
+; Map area: Y 16..239 (14 metatile rows below 16px status bar)
 EDGE_LEFT   = 0
 EDGE_RIGHT  = 240          ; Player X >= this = at right edge
-EDGE_TOP    = 0
+EDGE_TOP    = 18           ; Player Y < this = at top edge (just below status bar)
 EDGE_BOTTOM = 224          ; Player Y >= this = at bottom edge
 
 ; Entry positions when arriving from adjacent screen
 ENTRY_FROM_LEFT   = 232    ; Arriving from left, place near right edge
 ENTRY_FROM_RIGHT  = 8      ; Arriving from right, place near left edge
 ENTRY_FROM_TOP    = 208    ; Arriving from top, place near bottom
-ENTRY_FROM_BOTTOM = 16     ; Arriving from bottom, place near top
+ENTRY_FROM_BOTTOM = 20     ; Arriving from bottom, place just below status bar
 
 .segment "PRG_FIXED"
 
@@ -100,7 +101,7 @@ ENTRY_FROM_BOTTOM = 16     ; Arriving from bottom, place near top
 
     ; --- Check TOP edge ---
     lda player_y
-    cmp #$02
+    cmp #EDGE_TOP
     bcs @not_top
 
     lda current_screen_y

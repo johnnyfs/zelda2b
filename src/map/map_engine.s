@@ -229,14 +229,28 @@
 ; map_write_attributes - Write attribute table for current screen
 ; ============================================================================
 ; Reads palette bits from metatile byte 4 (bits 0-1) and packs them into
-; NES attribute table format.
+; NES attribute table format, accounting for 2-tile-row status bar offset.
 ;
 ; NES attribute table: 64 bytes at $23C0
 ; Each byte controls a 4x4 tile (2x2 metatile) area:
-;   bits 0-1: top-left metatile palette
-;   bits 2-3: top-right metatile palette
-;   bits 4-5: bottom-left metatile palette
-;   bits 6-7: bottom-right metatile palette
+;   bits 0-1: top-left quadrant palette
+;   bits 2-3: top-right quadrant palette
+;   bits 4-5: bottom-left quadrant palette
+;   bits 6-7: bottom-right quadrant palette
+;
+; With status bar offset, the mapping from attribute row to metatile row is:
+;   attr_row 0, top half:  tile rows 0-1 = status bar → palette 0
+;   attr_row 0, bot half:  tile rows 2-3 = metatile row 0
+;   attr_row 1, top half:  tile rows 4-5 = metatile row 1
+;   attr_row 1, bot half:  tile rows 6-7 = metatile row 2
+;   ...
+;   attr_row N, quadrant:  tile_row = N*4 + offset
+;                           metatile_row = (tile_row - 2) / 2
+;
+; For the TL/TR quadrants: tile_row_base = attr_row * 4
+; For the BL/BR quadrants: tile_row_base = attr_row * 4 + 2
+; A quadrant is in the status bar if tile_row_base < 2
+; A quadrant is past the map if metatile_row >= MAP_SCREEN_H
 ; ============================================================================
 
 .proc map_write_attributes
@@ -268,24 +282,31 @@
     jmp @attr_row_next
 @attr_col_ok:
 
-    ; Build attribute byte from 4 metatiles
-    ; meta_row = attr_row * 2, meta_col = attr_col * 2
+    ; Build attribute byte from 4 quadrants
     lda #$00
     sta temp_1              ; attr_byte accumulator
 
-    ; --- Top-left metatile palette (bits 0-1) ---
+    ; --- Top-left quadrant palette (bits 0-1) ---
+    ; tile_row_base = attr_row * 4
     lda temp_2
-    asl a                   ; meta_row = attr_row * 2
+    asl a
+    asl a                   ; A = attr_row * 4 = tile_row_base
+    cmp #$02                ; < 2 = status bar
+    bcc @tl_zero
+    ; metatile_row = (tile_row_base - 2) / 2
+    sec
+    sbc #$02
+    lsr a                   ; A = metatile_row
     cmp #MAP_SCREEN_H
     bcs @tl_zero
-    ; offset = meta_row * 16 + meta_col
+    ; offset = metatile_row * 16 + metatile_col
     asl a
     asl a
     asl a
-    asl a                   ; meta_row * 16
+    asl a                   ; metatile_row * 16
     sta temp_0
     lda temp_3
-    asl a                   ; meta_col = attr_col * 2
+    asl a                   ; metatile_col = attr_col * 2
     clc
     adc temp_0
     tay
@@ -297,9 +318,15 @@
 @tl_store:
     sta temp_1
 
-    ; --- Top-right metatile palette (bits 2-3) ---
+    ; --- Top-right quadrant palette (bits 2-3) ---
     lda temp_2
     asl a
+    asl a
+    cmp #$02
+    bcc @tr_zero
+    sec
+    sbc #$02
+    lsr a
     cmp #MAP_SCREEN_H
     bcs @tr_zero
     asl a
@@ -310,7 +337,7 @@
     lda temp_3
     asl a
     clc
-    adc #$01
+    adc #$01                ; metatile_col + 1
     clc
     adc temp_0
     tay
@@ -325,11 +352,18 @@
     ora temp_1
     sta temp_1
 
-    ; --- Bottom-left metatile palette (bits 4-5) ---
+    ; --- Bottom-left quadrant palette (bits 4-5) ---
+    ; tile_row_base = attr_row * 4 + 2
     lda temp_2
     asl a
+    asl a
     clc
-    adc #$01
+    adc #$02                ; A = attr_row * 4 + 2
+    cmp #$02
+    bcc @bl_zero
+    sec
+    sbc #$02
+    lsr a                   ; metatile_row
     cmp #MAP_SCREEN_H
     bcs @bl_zero
     asl a
@@ -355,11 +389,17 @@
     ora temp_1
     sta temp_1
 
-    ; --- Bottom-right metatile palette (bits 6-7) ---
+    ; --- Bottom-right quadrant palette (bits 6-7) ---
     lda temp_2
     asl a
+    asl a
     clc
-    adc #$01
+    adc #$02
+    cmp #$02
+    bcc @br_zero
+    sec
+    sbc #$02
+    lsr a
     cmp #MAP_SCREEN_H
     bcs @br_zero
     asl a
