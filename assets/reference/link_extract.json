@@ -1,0 +1,32 @@
+{
+  "source": "link_sprites.png",
+  "bg_color": [0, 128, 0],
+  "notes": "Coordinates from Spriters Resource Link's Awakening DX Link sheet (533x361)",
+  "sprites": [
+    {"name": "link_idle_down",    "rect": [1, 11, 16, 16]},
+    {"name": "link_walk_down_1",  "rect": [18, 11, 16, 16]},
+    {"name": "link_idle_up",      "rect": [35, 11, 16, 16]},
+    {"name": "link_walk_up_1",    "rect": [52, 11, 16, 16]},
+    {"name": "link_idle_right",   "rect": [73, 11, 16, 16]},
+    {"name": "link_walk_right_1", "rect": [90, 11, 16, 16]},
+    {"name": "link_walk_right_2", "rect": [107, 11, 16, 16]},
+    {"name": "link_idle_left",    "rect": [124, 11, 16, 16]},
+    {"name": "link_walk_left_1",  "rect": [141, 11, 16, 16]},
+    {"name": "link_walk_left_2",  "rect": [158, 11, 16, 16]},
+    {"name": "link_swim_down",    "rect": [175, 11, 16, 16]},
+    {"name": "link_swim_up",      "rect": [192, 11, 16, 16]},
+    {"name": "link_swim_right",   "rect": [209, 11, 16, 16]},
+    {"name": "link_swim_left",    "rect": [226, 11, 16, 16]},
+    {"name": "link_jump_down",    "rect": [247, 11, 16, 16]},
+    {"name": "link_jump_up",      "rect": [264, 11, 16, 16]},
+    {"name": "link_jump_right",   "rect": [281, 11, 16, 16]},
+    {"name": "link_jump_left",    "rect": [298, 11, 16, 16]},
+    {"name": "link_jump_down_2",  "rect": [315, 11, 16, 16]},
+    {"name": "link_jump_up_2",    "rect": [332, 11, 16, 16]},
+    {"name": "link_jump_right_2", "rect": [349, 11, 16, 16]},
+    {"name": "link_jump_left_2",  "rect": [366, 11, 16, 16]},
+    {"name": "link_pickup",       "rect": [404, 11, 16, 16]},
+    {"name": "link_pickup_2",     "rect": [421, 11, 16, 16]},
+    {"name": "link_ocarina",      "rect": [480, 11, 16, 16]}
+  ]
+}
