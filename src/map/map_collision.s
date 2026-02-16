@@ -11,6 +11,9 @@ HITBOX_SIZE  = 12
 .segment "PRG_FIXED"
 
 .proc check_collision
+    ; DEBUG: always allow movement until collision is debugged
+    clc
+    rts
     ; Corner 1: Top-left
     lda temp_2
     clc

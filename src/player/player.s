@@ -304,15 +304,11 @@ SCREEN_RIGHT        = 240
 .endproc
 
 ; Sprite tile table: base tile (TL) for each direction + animation frame.
-; CHR layout (from TILE_MAP.md):
-;   Link Down:  $01(TL), $02(TR), $03(BL), $04(BR)
-;   Link Up:    $05(TL), $06(TR), $07(BL), $08(BR)
-;   Link Right: $09(TL), $0A(TR), $0B(BL), $0C(BR)
-;   Walk legs:  $0D(alt BL), $0E(alt BR)
-; Left = Right tiles with H-flip.
+; Frame 0 = solid fill (color 3), Frame 1 = outline (color 1) for pulsating effect.
 ; Draw routine adds: TR=base+1, BL=base+2, BR=base+3.
+; Left = Right tiles with H-flip.
 sprite_tile_table:
-    .byte $05, $05    ; DIR_UP frame 0, 1
-    .byte $01, $01    ; DIR_DOWN frame 0, 1
-    .byte $09, $09    ; DIR_LEFT frame 0, 1 (uses RIGHT tiles, flipped)
-    .byte $09, $09    ; DIR_RIGHT frame 0, 1
+    .byte $05, $11    ; DIR_UP   frame 0 (solid), frame 1 (outline)
+    .byte $01, $0D    ; DIR_DOWN frame 0 (solid), frame 1 (outline)
+    .byte $09, $15    ; DIR_LEFT frame 0, 1 (uses RIGHT tiles, flipped)
+    .byte $09, $15    ; DIR_RIGHT frame 0, 1
