@@ -155,6 +155,7 @@ GLOBALS_INC = 1
 .global item_give
 .global magic_consume
 .global mark_current_screen_visited
+.global bit_mask_table
 
 ; -- map/warps.s --
 .global warp_init

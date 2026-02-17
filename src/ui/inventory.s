@@ -115,6 +115,11 @@ COUNTER_COUNT = 4
     lda #$00
     sta PPUMASK
 
+    ; --- Ensure PPUCTRL increment mode = +1 (horizontal) ---
+    lda ppu_ctrl_shadow
+    and #<~PPUCTRL_INC_32   ; Clear increment-32 bit
+    sta PPUCTRL
+
     ; --- Draw overlay border ---
     jsr inv_draw_border
 
@@ -198,24 +203,16 @@ COUNTER_COUNT = 4
     asl                     ; *4
     clc
     adc inv_cursor_x
-    tax
+    tax                     ; X = grid slot index
     lda b_item_table, x     ; Get ITEM_xxx for this slot
     beq @no_select           ; ITEM_NONE = can't select
+    sta temp_0               ; Save item_id
     ; Check if player owns it
     tax
     lda player_items, x
     beq @no_select           ; Don't own it
     ; Assign to B-button
-    lda b_item_table, x
-    ; Wait - need to re-get the item id properly
-    ; Re-compute: index in table
-    lda inv_cursor_y
-    asl
-    asl
-    clc
-    adc inv_cursor_x
-    tax
-    lda b_item_table, x
+    lda temp_0
     sta selected_b_item
     ; Play SFX would go here
 @no_select:
@@ -475,32 +472,73 @@ COUNTER_COUNT = 4
     lda player_items, x
     beq @empty_slot
 
-    ; Player owns it: write portrait top-left tile
+    ; Player owns it: write 2x2 portrait (TL, TR on this row, BL, BR on next)
     lda item_portrait_tiles, x
+    sta temp_1              ; save base tile
+    ; TL tile (PPU addr already set to row, col)
     sta PPUDATA
-    ; Write top-right tile (base+1)
+    ; TR tile (PPU auto-incremented to row, col+1)
     clc
     adc #$01
-    ; Actually we need to re-read. Let's just use the tile+1 approach.
-    ; But PPUDATA auto-increments by 1, so next write goes to col+1.
-    ; For a 2x2 portrait we need:
-    ;   (row, col): TL   (row, col+1): TR
-    ;   (row+1, col): BL  (row+1, col+1): BR
-    ; PPU increments horizontally by default, so TL then TR is fine.
-    ; But BL/BR need a new address. For simplicity, just write TL here.
-    ; The sprite overlay will handle the 16x16 rendering.
-    ; Actually, let's just write TL tile as the BG indicator.
+    sta PPUDATA
+
+    ; Now set PPU addr for bottom row: (row+1, col)
+    ; ptr_lo/ptr_hi still hold the address of (row, col)
+    ; Add 32 to get next tile row
+    lda ptr_lo
+    clc
+    adc #32
+    sta ptr_lo
+    lda ptr_hi
+    adc #$00
+    sta ptr_hi
+    lda PPUSTATUS
+    lda ptr_hi
+    sta PPUADDR
+    lda ptr_lo
+    sta PPUADDR
+
+    ; BL tile
+    lda temp_1
+    clc
+    adc #$02
+    sta PPUDATA
+    ; BR tile
+    lda temp_1
+    clc
+    adc #$03
+    sta PPUDATA
     jmp @next_slot
 
 @empty_slot:
-    lda #$00                ; blank tile
+    ; Write 2x2 blank (TL, TR)
+    lda #$00
+    sta PPUDATA
+    sta PPUDATA
+    ; Bottom row (BL, BR)
+    lda ptr_lo
+    clc
+    adc #32
+    sta ptr_lo
+    lda ptr_hi
+    adc #$00
+    sta ptr_hi
+    lda PPUSTATUS
+    lda ptr_hi
+    sta PPUADDR
+    lda ptr_lo
+    sta PPUADDR
+    lda #$00
+    sta PPUDATA
     sta PPUDATA
 
 @next_slot:
     inc temp_2
     lda temp_2
     cmp #(INV_GRID_COLS * INV_GRID_ROWS)
-    bne @grid_loop
+    beq @grid_done
+    jmp @grid_loop
+@grid_done:
 
     ; --- Draw crystal obelisks ---
     jsr inv_draw_crystals
@@ -686,7 +724,7 @@ COUNTER_COUNT = 4
     sta $0200, x
     inx
 
-    ; Top-right corner
+    ; Top-right corner (at right edge of 16px item)
     lda temp_1
     sta $0200, x
     inx
@@ -698,14 +736,14 @@ COUNTER_COUNT = 4
     inx
     lda temp_0
     clc
-    adc #8                  ; offset right by 8px (item is 16px but we mark edge)
+    adc #8                  ; 16px item, bracket at right half
     sta $0200, x
     inx
 
-    ; Bottom-left corner
+    ; Bottom-left corner (at bottom edge of 16px item)
     lda temp_1
     clc
-    adc #8
+    adc #8                  ; 16px item, bracket at bottom half
     sta $0200, x
     inx
     lda #$7E
