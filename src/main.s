@@ -14,6 +14,7 @@
 .include "combat.inc"
 .include "bombs.inc"
 .include "hud.inc"
+.include "warps.inc"
 
 .segment "PRG_FIXED"
 
@@ -90,6 +91,13 @@
 
     ; Update HUD (checks for HP/magic changes, queues PPU buffer writes)
     jsr hud_update
+
+    ; Check for cave warp (door tile warps)
+    jsr warp_check
+    cmp #$01                ; Did a warp occur?
+    bne @no_warp
+    jmp @state_done         ; Warp already loaded screen + HUD, skip transition
+@no_warp:
 
     ; Check for screen edge transition
     jsr map_check_transition

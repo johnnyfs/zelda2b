@@ -29,10 +29,12 @@
 screen_ptrs_lo:
     .byte <screen_0, <screen_1, <screen_2
     .byte <screen_3, <screen_4, <screen_5
+    .byte <screen_6, <screen_7
 
 screen_ptrs_hi:
     .byte >screen_0, >screen_1, >screen_2
     .byte >screen_3, >screen_4, >screen_5
+    .byte >screen_6, >screen_7
 
 ; ============================================================================
 ; Screen 0: Starting area - grassy field with path crossroads
@@ -200,7 +202,7 @@ screen_4:
     .byte  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3
 
 ; ============================================================================
-; Screen 5: Southern lake shore
+; Screen 5: Southern lake shore (last overworld screen)
 ; ============================================================================
 screen_5:
     ; Row 0
@@ -231,3 +233,76 @@ screen_5:
     .byte  3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3
     ; Row 13
     .byte  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3
+
+; ============================================================================
+; Screen 6: Cave A Interior - Simple single-room cave
+; ============================================================================
+; Stone walls surround a stone floor interior with a door at the bottom
+; to exit back to the overworld. Contains a path leading to the exit.
+; Reachable from: Screen 3 left cave, Screen 4 left/bottom-left buildings
+; Metatiles: 14=stone_wall(solid), 13=stone_floor, 7=door, 5=path
+screen_6:
+    ; Row 0 - solid stone wall top
+    .byte 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14
+    ; Row 1
+    .byte 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14
+    ; Row 2
+    .byte 14, 14, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 14, 14
+    ; Row 3
+    .byte 14, 14, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 14, 14
+    ; Row 4
+    .byte 14, 14, 13, 13, 14, 13, 13, 13, 13, 13, 13, 14, 13, 13, 14, 14
+    ; Row 5
+    .byte 14, 14, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 14, 14
+    ; Row 6
+    .byte 14, 14, 13, 13, 13, 13, 13, 5, 5, 13, 13, 13, 13, 13, 14, 14
+    ; Row 7
+    .byte 14, 14, 13, 13, 13, 13, 13, 5, 5, 13, 13, 13, 13, 13, 14, 14
+    ; Row 8
+    .byte 14, 14, 13, 13, 14, 13, 13, 5, 5, 13, 13, 14, 13, 13, 14, 14
+    ; Row 9
+    .byte 14, 14, 13, 13, 13, 13, 13, 5, 5, 13, 13, 13, 13, 13, 14, 14
+    ; Row 10
+    .byte 14, 14, 13, 13, 13, 13, 13, 5, 5, 13, 13, 13, 13, 13, 14, 14
+    ; Row 11
+    .byte 14, 14, 14, 14, 14, 14, 14, 5, 5, 14, 14, 14, 14, 14, 14, 14
+    ; Row 12 - exit door at bottom center (2 tiles wide)
+    .byte 14, 14, 14, 14, 14, 14, 14, 7, 7, 14, 14, 14, 14, 14, 14, 14
+    ; Row 13
+    .byte 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14
+
+; ============================================================================
+; Screen 7: Cave B Interior - Larger cave with pillars
+; ============================================================================
+; A wider cave interior with stone pillar obstacles.
+; Reachable from: Screen 3 right cave, Screen 4 right/bottom-right buildings
+; Metatiles: 14=stone_wall(solid), 13=stone_floor, 7=door, 5=path
+screen_7:
+    ; Row 0 - solid stone wall top
+    .byte 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14
+    ; Row 1
+    .byte 14, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 14
+    ; Row 2
+    .byte 14, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 14
+    ; Row 3
+    .byte 14, 13, 13, 14, 13, 13, 13, 13, 13, 13, 13, 13, 14, 13, 13, 14
+    ; Row 4
+    .byte 14, 13, 13, 14, 13, 13, 13, 13, 13, 13, 13, 13, 14, 13, 13, 14
+    ; Row 5
+    .byte 14, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 14
+    ; Row 6
+    .byte 14, 13, 13, 13, 13, 13, 14, 13, 13, 14, 13, 13, 13, 13, 13, 14
+    ; Row 7
+    .byte 14, 13, 13, 13, 13, 13, 14, 13, 13, 14, 13, 13, 13, 13, 13, 14
+    ; Row 8
+    .byte 14, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 14
+    ; Row 9
+    .byte 14, 13, 13, 14, 13, 13, 13, 13, 13, 13, 13, 13, 14, 13, 13, 14
+    ; Row 10
+    .byte 14, 13, 13, 14, 13, 13, 13, 5, 5, 13, 13, 13, 14, 13, 13, 14
+    ; Row 11
+    .byte 14, 13, 13, 13, 13, 13, 13, 5, 5, 13, 13, 13, 13, 13, 13, 14
+    ; Row 12 - exit door at bottom center (2 tiles wide)
+    .byte 14, 14, 14, 14, 14, 14, 14, 7, 7, 14, 14, 14, 14, 14, 14, 14
+    ; Row 13
+    .byte 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14

@@ -34,7 +34,8 @@ STATUS_BAR_Y_PX     = 16        ; Pixel height of status bar
 
 MAP_GRID_W_CONST    = 3         ; Grid width (screens)
 MAP_GRID_H_CONST    = 2         ; Grid height (screens)
-MAP_GRID_TOTAL      = 6         ; Total screens (W * H)
+MAP_GRID_TOTAL      = 6         ; Overworld screens (W * H)
+MAP_TOTAL_SCREENS   = 8         ; Total screens including caves (6 + 2 cave interiors)
 
 ; ============================================================================
 ; Metatile Constants
