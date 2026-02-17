@@ -48,6 +48,9 @@ SOURCES := \
 	$(SRCDIR)/enemies/enemy_types.s \
 	$(SRCDIR)/items/pickups.s \
 	$(SRCDIR)/items/bombs.s \
+	$(SRCDIR)/items/item_system.s \
+	$(SRCDIR)/ui/inventory.s \
+	$(SRCDIR)/ui/map_screen.s \
 	$(SRCDIR)/map/map_vars.s \
 	$(SRCDIR)/map/map_collision.s \
 	$(SRCDIR)/map/map_engine.s \
