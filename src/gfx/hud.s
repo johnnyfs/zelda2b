@@ -26,6 +26,8 @@
 .include "enums.inc"
 .include "combat.inc"
 .include "hud.inc"
+.include "inventory.inc"
+.include "shop.inc"
 
 .segment "PRG_FIXED"
 
@@ -122,21 +124,86 @@
     sta PPUDATA
     sta PPUDATA
 
-    ; Columns 20-23: Magic bottles
-    ldx #$00
+    ; Columns 20-23: Magic bottles (filled/empty based on magic_bottles_count & player_magic)
+    ; Each bottle = 8 magic points. Filled if player_magic >= (bottle_index+1)*8
+    lda magic_bottles_count
+    sta temp_2                  ; temp_2 = total bottles owned
+
+    ldx #$00                    ; Bottle index (0..3)
 @magic_loop:
     cpx #HUD_MAX_MAGIC
     bcs @magic_done
-    ; For now, all magic bottles empty (magic system not yet implemented)
+
+    cpx temp_2                  ; Past owned bottles?
+    bcs @magic_blank
+
+    ; Calculate threshold: (X+1) * 8
+    ; If player_magic >= threshold, bottle is full
+    txa
+    clc
+    adc #$01                    ; A = bottle_index + 1
+    asl a                       ; *2
+    asl a                       ; *4
+    asl a                       ; *8 = threshold
+    sta temp_3                  ; temp_3 = threshold
+
+    lda player_magic
+    cmp temp_3
+    bcs @magic_full             ; player_magic >= threshold -> full
+    ; Otherwise empty (but owned)
     lda #HUD_TILE_MAGIC_EMPTY
+    jmp @magic_write
+@magic_full:
+    lda #HUD_TILE_MAGIC_FULL
+    jmp @magic_write
+@magic_blank:
+    lda #HUD_TILE_BLANK
+@magic_write:
     sta PPUDATA
     inx
     jmp @magic_loop
 @magic_done:
 
-    ; Columns 24-31: blank (8 tiles to fill row)
+    ; Column 24: Rupee icon
+    lda #HUD_TILE_RUPEE
+    sta PPUDATA
+
+    ; Columns 25-26: Rupee count as 2-digit number (tens, ones)
+    ; Read player_rupees_lo (0-255), display as decimal tens+ones (capped at 99 display)
+    lda player_rupees_lo
+    cmp #100                    ; Cap display at 99
+    bcc @rupee_ok
+    lda #99
+@rupee_ok:
+    ; Divide A by 10 to get tens digit
+    ; Simple repeated subtraction
+    ldy #$00                    ; Y = tens digit
+@div10:
+    cmp #10
+    bcc @div10_done
+    sec
+    sbc #10
+    iny
+    jmp @div10
+@div10_done:
+    ; A = ones digit, Y = tens digit
+    sta temp_3                  ; Save ones digit
+
+    ; Write tens digit tile
+    tya
+    clc
+    adc #HUD_TILE_DIGIT_0
+    sta PPUDATA
+
+    ; Write ones digit tile
+    lda temp_3
+    clc
+    adc #HUD_TILE_DIGIT_0
+    sta PPUDATA
+
+    ; Columns 27-31: blank (5 tiles to fill row)
     lda #HUD_TILE_BLANK
-    ldx #$08
+    ldx #$05
 @space_end_r0:
     sta PPUDATA
     dex
@@ -201,8 +268,11 @@
     ; --- Initialize HUD state ---
     lda player_hp
     sta hud_hp_cache
+    lda player_magic
+    sta hud_magic_cache
+    lda player_rupees_lo
+    sta hud_rupee_cache
     lda #$00
-    sta hud_magic_cache         ; Magic not implemented yet, default 0
     sta hud_dirty
 
     ; --- Set PPU address to nametable row 0 ($2000) ---
@@ -268,14 +338,26 @@
     jsr hud_queue_hearts
 
 @no_hp_change:
-    ; Magic check placeholder (for future magic system)
-    ; lda player_magic
-    ; cmp hud_magic_cache
-    ; beq @no_magic_change
-    ; sta hud_magic_cache
-    ; jsr hud_queue_magic
-    ; @no_magic_change:
+    ; --- Check if magic changed ---
+    lda player_magic
+    cmp hud_magic_cache
+    beq @no_magic_change
 
+    ; Magic changed - update cache and queue bottle redraw
+    sta hud_magic_cache
+    jsr hud_queue_magic
+
+@no_magic_change:
+    ; --- Check if rupees changed ---
+    lda player_rupees_lo
+    cmp hud_rupee_cache
+    beq @no_rupee_change
+
+    ; Rupees changed - update cache and queue rupee redraw
+    sta hud_rupee_cache
+    jsr hud_queue_rupees
+
+@no_rupee_change:
     rts
 .endproc
 
@@ -401,27 +483,11 @@
     sta ppu_buffer, x
     inx
 
-    ; Queue magic bottles (row 0, cols 20-23)
-    lda #$20                    ; PPU addr high
-    sta ppu_buffer, x
-    inx
-    lda #$14                    ; PPU addr low (col 20)
-    sta ppu_buffer, x
-    inx
-    lda #HUD_MAX_MAGIC          ; 4 bytes
-    sta ppu_buffer, x
-    inx
-
-    ldy #$00
-@magic_loop:
-    cpy #HUD_MAX_MAGIC
-    bcs @magic_done
-    lda #HUD_TILE_MAGIC_EMPTY   ; All empty for now
-    sta ppu_buffer, x
-    inx
-    iny
-    jmp @magic_loop
-@magic_done:
+    ; Queue magic bottles and rupee display via dedicated routines
+    stx ppu_buffer_len
+    jsr hud_queue_magic
+    jsr hud_queue_rupees
+    ldx ppu_buffer_len
 
     ; Queue B-item box row 1 (row 1, cols 12-13: BL, BR)
     lda #$20                    ; PPU addr high
@@ -483,5 +549,139 @@
 
     stx ppu_buffer_len
 
+    rts
+.endproc
+
+; ============================================================================
+; hud_queue_magic - Queue magic bottle tiles into PPU write buffer
+; ============================================================================
+; Builds a buffer entry to update nametable row 0, columns 20-23 with the
+; current magic bottle states (filled/empty based on magic_bottles_count
+; and player_magic). Each bottle = 8 magic points.
+; Clobbers: A, X, Y
+; ============================================================================
+
+.proc hud_queue_magic
+    ldx ppu_buffer_len
+
+    ; PPU address: $2014 (row 0, column 20)
+    lda #$20
+    sta ppu_buffer, x
+    inx
+    lda #$14
+    sta ppu_buffer, x
+    inx
+
+    ; Length: 4 bytes (HUD_MAX_MAGIC bottles)
+    lda #HUD_MAX_MAGIC
+    sta ppu_buffer, x
+    inx
+
+    ; Determine bottle states
+    lda magic_bottles_count
+    sta temp_2                  ; total owned bottles
+
+    ldy #$00                    ; Bottle index
+@bottle_loop:
+    cpy #HUD_MAX_MAGIC
+    bcs @bottles_done
+
+    cpy temp_2                  ; Past owned bottles?
+    bcs @bottle_blank
+
+    ; Calculate threshold: (Y+1) * 8
+    tya
+    clc
+    adc #$01
+    asl a                       ; *2
+    asl a                       ; *4
+    asl a                       ; *8
+    sta temp_3
+
+    lda player_magic
+    cmp temp_3
+    bcs @bottle_full
+
+    lda #HUD_TILE_MAGIC_EMPTY
+    jmp @bottle_store
+@bottle_full:
+    lda #HUD_TILE_MAGIC_FULL
+    jmp @bottle_store
+@bottle_blank:
+    lda #HUD_TILE_BLANK
+@bottle_store:
+    sta ppu_buffer, x
+    inx
+    iny
+    jmp @bottle_loop
+
+@bottles_done:
+    stx ppu_buffer_len
+    rts
+.endproc
+
+; ============================================================================
+; hud_queue_rupees - Queue rupee icon + 2-digit count into PPU write buffer
+; ============================================================================
+; Builds a buffer entry to update nametable row 0, columns 24-26 with
+; the rupee icon and current rupee count (low byte, 0-99 display).
+; Clobbers: A, X, Y
+; ============================================================================
+
+.proc hud_queue_rupees
+    ldx ppu_buffer_len
+
+    ; PPU address: $2018 (row 0, column 24)
+    lda #$20
+    sta ppu_buffer, x
+    inx
+    lda #$18
+    sta ppu_buffer, x
+    inx
+
+    ; Length: 3 bytes (icon + tens + ones)
+    lda #$03
+    sta ppu_buffer, x
+    inx
+
+    ; Rupee icon
+    lda #HUD_TILE_RUPEE
+    sta ppu_buffer, x
+    inx
+
+    ; Read rupee count, cap at 99 for 2-digit display
+    lda player_rupees_lo
+    cmp #100
+    bcc @rupee_cap_ok
+    lda #99
+@rupee_cap_ok:
+    ; Divide by 10 using repeated subtraction
+    ldy #$00                    ; Y = tens digit
+@div10:
+    cmp #10
+    bcc @div10_done
+    sec
+    sbc #10
+    iny
+    jmp @div10
+@div10_done:
+    ; A = ones digit, Y = tens digit
+    sta temp_3                  ; Save ones
+
+    ; Tens digit tile
+    tya
+    clc
+    adc #HUD_TILE_DIGIT_0
+    sta ppu_buffer, x
+    inx
+
+    ; Ones digit tile
+    lda temp_3
+    clc
+    adc #HUD_TILE_DIGIT_0
+    sta ppu_buffer, x
+    inx
+
+    stx ppu_buffer_len
     rts
 .endproc

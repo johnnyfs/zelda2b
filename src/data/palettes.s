@@ -42,9 +42,9 @@ default_palette:
     ; Black bg, dark brown, medium brown, tan
     .byte $0F, $07, $17, $27
 
-    ; BG Palette 3: UI/text
-    ; Black bg, dark gray, light gray, white
-    .byte $0F, $00, $10, $30
+    ; BG Palette 3: UI/HUD
+    ; Black bg, blue (magic fill/rupee), light gray, white
+    .byte $0F, $12, $10, $30
 
     ; --- Sprite palettes ---
 

@@ -96,6 +96,7 @@ player_invuln_timer:.res 1      ; Invincibility frames countdown
 hud_dirty:          .res 1      ; Non-zero = HUD needs VRAM update
 hud_hp_cache:       .res 1      ; Cached player HP (detect changes)
 hud_magic_cache:    .res 1      ; Cached magic value (detect changes)
+hud_rupee_cache:    .res 1      ; Cached rupee count (detect changes)
 
 ; --- Pickup state (parallel arrays, MAX_PICKUPS=4 slots) ---
 pickup_x:           .res MAX_PICKUPS    ; X positions
