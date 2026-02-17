@@ -425,6 +425,136 @@
 .endproc
 
 ; ============================================================================
+; shop_update_rupee_display - Buffer rupee count to PPU for live update
+; ============================================================================
+; Called each frame when shop is active. Writes "RUPEES:XXX" at row 26
+; via PPU buffer so it updates during NMI without disabling rendering.
+; Clobbers: A, X, Y
+; ============================================================================
+
+.proc shop_update_rupee_display
+    lda shop_active
+    bne @active
+    rts
+@active:
+    ; Build PPU buffer entry: addr_hi, addr_lo, length, data...
+    ldx ppu_buffer_len
+
+    ; PPU address high byte
+    lda #RUPEE_DISP_ADDR_HI
+    sta ppu_buffer, x
+    inx
+
+    ; PPU address low byte
+    lda #RUPEE_DISP_ADDR_LO
+    sta ppu_buffer, x
+    inx
+
+    ; Length: "RUPEES:" = 7 chars + 3 digits = 10 bytes
+    lda #10
+    sta ppu_buffer, x
+    inx
+
+    ; "RUPEES:" using font tiles (A=$40, so R=$51, U=$55, P=$50, E=$45, S=$53)
+    lda #$51                    ; R
+    sta ppu_buffer, x
+    inx
+    lda #$55                    ; U
+    sta ppu_buffer, x
+    inx
+    lda #$50                    ; P
+    sta ppu_buffer, x
+    inx
+    lda #$45                    ; E
+    sta ppu_buffer, x
+    inx
+    lda #$45                    ; E
+    sta ppu_buffer, x
+    inx
+    lda #$53                    ; S
+    sta ppu_buffer, x
+    inx
+    lda #FONT_TILE_COLON        ; :
+    sta ppu_buffer, x
+    inx
+
+    ; Convert 16-bit rupees to 3 decimal digits
+    ; We need to convert player_rupees_lo/hi to hundreds, tens, ones
+    ; For simplicity, cap display at 999 (already capped in collection)
+    stx temp_1                  ; Save buffer index
+
+    ; Copy rupees to working area
+    lda player_rupees_lo
+    sta ptr_lo
+    lda player_rupees_hi
+    sta ptr_hi
+
+    ; Extract hundreds: subtract 100 repeatedly
+    lda #$00
+    sta temp_0                  ; hundreds digit
+@hundreds:
+    ; Compare ptr_hi:ptr_lo >= 100
+    lda ptr_hi
+    bne @sub_hundred            ; If hi > 0, definitely >= 100
+    lda ptr_lo
+    cmp #100
+    bcc @hundreds_done
+@sub_hundred:
+    ; Subtract 100 from 16-bit value
+    lda ptr_lo
+    sec
+    sbc #100
+    sta ptr_lo
+    lda ptr_hi
+    sbc #$00
+    sta ptr_hi
+    inc temp_0
+    jmp @hundreds
+@hundreds_done:
+
+    ; Write hundreds digit tile to buffer
+    ldx temp_1
+    lda temp_0
+    clc
+    adc #FONT_TILE_0
+    sta ppu_buffer, x
+    inx
+
+    ; Extract tens
+    lda #$00
+    sta temp_0                  ; tens digit
+@tens:
+    lda ptr_lo
+    cmp #10
+    bcc @tens_done
+    sec
+    sbc #10
+    sta ptr_lo
+    inc temp_0
+    jmp @tens
+@tens_done:
+
+    ; Write tens digit tile to buffer
+    lda temp_0
+    clc
+    adc #FONT_TILE_0
+    sta ppu_buffer, x
+    inx
+
+    ; Write ones digit tile to buffer
+    lda ptr_lo
+    clc
+    adc #FONT_TILE_0
+    sta ppu_buffer, x
+    inx
+
+    ; Update buffer length
+    stx ppu_buffer_len
+
+    rts
+.endproc
+
+; ============================================================================
 ; write_price_digits
 ; ============================================================================
 .proc write_price_digits
