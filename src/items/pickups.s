@@ -11,6 +11,7 @@
 .include "enums.inc"
 .include "combat.inc"
 .include "audio.inc"
+.include "shop.inc"
 
 .segment "PRG_FIXED"
 
@@ -153,6 +154,8 @@
     lda pickup_type, x
     cmp #PICKUP_HEART
     beq @collect_heart
+    cmp #PICKUP_RUPEE
+    beq @collect_rupee
     ; Future: other pickup types here
     jmp @deactivate
 
@@ -162,6 +165,30 @@
     cmp player_max_hp
     bcs @deactivate             ; Already at max HP, still collect but no heal
     inc player_hp
+    jmp @deactivate
+
+@collect_rupee:
+    ; Add RUPEE_VALUE_GREEN (1) to 16-bit player_rupees
+    lda player_rupees_lo
+    clc
+    adc #RUPEE_VALUE_GREEN
+    sta player_rupees_lo
+    lda player_rupees_hi
+    adc #$00
+    sta player_rupees_hi
+    ; Cap at 999 ($03E7)
+    cmp #$04                    ; Hi byte > 3 means > 1023
+    bcc @rupee_ok
+    bne @cap_rupees
+    lda player_rupees_lo
+    cmp #$E8                    ; If hi=3, lo >= $E8 (1000) = over 999
+    bcc @rupee_ok
+@cap_rupees:
+    lda #$E7
+    sta player_rupees_lo        ; $03E7 = 999
+    lda #$03
+    sta player_rupees_hi
+@rupee_ok:
 
 @deactivate:
     ; Deactivate slot
@@ -215,11 +242,16 @@
     ; Tile index based on type
     lda pickup_type, x
     cmp #PICKUP_HEART
-    bne @default_tile
+    beq @tile_heart
+    cmp #PICKUP_RUPEE
+    beq @tile_rupee
+    lda #PICKUP_HEART_TILE      ; Fallback
+    jmp @write_tile
+@tile_heart:
     lda #PICKUP_HEART_TILE
     jmp @write_tile
-@default_tile:
-    lda #PICKUP_HEART_TILE      ; Fallback
+@tile_rupee:
+    lda #PICKUP_RUPEE_TILE
 @write_tile:
     sta $0200, y
     iny

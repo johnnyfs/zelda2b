@@ -102,6 +102,7 @@ MAX_PICKUPS             = 4         ; Maximum active pickup slots
 PICKUP_NONE             = 0         ; Empty slot
 PICKUP_HEART            = 1         ; Restores 1 HP
 PICKUP_MAGIC            = 2         ; Restores magic (future)
+PICKUP_RUPEE            = 3         ; Green rupee (value 1)
 
 ; Pickup states
 PICKUP_STATE_INACTIVE   = 0         ; Slot available
@@ -115,6 +116,10 @@ PICKUP_COLLECT_DIST     = 12        ; Overlap distance for collection
 
 ; Pickup sprite tiles (from sprite pattern table)
 PICKUP_HEART_TILE       = $25       ; Single 8x8 tile for heart pickup
+PICKUP_RUPEE_TILE       = $26       ; Single 8x8 tile for green rupee
+
+; Rupee values
+RUPEE_VALUE_GREEN       = 1         ; Green rupee value
 
 ; ============================================================================
 ; Pickup Zero-Page Variable Declarations

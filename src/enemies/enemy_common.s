@@ -93,9 +93,17 @@
     lda #ENEMY_STATE_INACTIVE
     sta enemy_state, x
     ; Save X, call pickup_spawn (A=type, temp_2/3=position)
+    ; 50% chance: heart or rupee (using frame_counter bit 0 as RNG)
     txa
     pha
+    lda frame_counter
+    and #$01
+    bne @drop_rupee
     lda #PICKUP_HEART
+    jmp @do_spawn
+@drop_rupee:
+    lda #PICKUP_RUPEE
+@do_spawn:
     jsr pickup_spawn
     pla
     tax

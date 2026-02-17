@@ -169,6 +169,7 @@ GLOBALS_INC = 1
 .global shop_update
 .global shop_draw_items
 .global shop_draw_prices
+.global shop_update_rupee_display
 
 ; -- data/shop_data.s --
 .global shop_data_table
