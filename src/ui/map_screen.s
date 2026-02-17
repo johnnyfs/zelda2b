@@ -34,6 +34,11 @@
     lda #$00
     sta PPUMASK
 
+    ; --- Ensure PPUCTRL increment mode = +1 (horizontal) ---
+    lda ppu_ctrl_shadow
+    and #<~PPUCTRL_INC_32   ; Clear increment-32 bit
+    sta PPUCTRL
+
     ; --- Draw overlay border (same as inventory) ---
     jsr map_draw_border
 
@@ -372,8 +377,4 @@
     rts
 .endproc
 
-; ============================================================================
-; Bit mask lookup table (shared with item_system.s via .global)
-; ============================================================================
-bit_mask_table:
-    .byte $01, $02, $04, $08, $10, $20, $40, $80
+; bit_mask_table is defined in item_system.s and imported via .global

@@ -39,6 +39,11 @@ SCREEN_RIGHT        = 240
 .endproc
 
 .proc player_update
+    ; --- Don't allow menu open during attack ---
+    lda player_state
+    cmp #PLAYER_STATE_ATTACK
+    beq @skip_menu_check
+
     ; --- Start: open inventory ---
     lda pad1_pressed
     and #BUTTON_START
@@ -54,6 +59,7 @@ SCREEN_RIGHT        = 240
     jsr map_screen_open
     rts
 @no_map:
+@skip_menu_check:
 
     ; --- Combat update (checks attack input, handles sword, damage) ---
     ; Returns carry set if player is attacking (suppress movement)
