@@ -6,7 +6,7 @@
 |------|------|---------|------------|
 | overworld_bg.chr | BG pattern table | Overworld background tiles | 32 / 256 |
 | dungeon_bg.chr | BG pattern table | Dungeon background tiles | 13 / 256 |
-| sprites.chr | Sprite pattern table | Player, enemies, items, effects | 34 / 256 |
+| sprite_tiles.chr | Sprite pattern table | Player, enemies, items, effects | 47 / 256 |
 | hud.chr | BG/Sprite | HUD elements | 13 / 256 |
 
 ## Overworld Background Tiles (overworld_bg.chr)
@@ -64,34 +64,49 @@
 | 11 | $0B | Spikes | Spike trap |
 | 12 | $0C | Chest | Dungeon chest |
 
-## Sprite Tiles (sprites.chr)
+## Sprite Tiles (sprite_tiles.chr)
+
+Source: link_sprites.chr (LA DX ripped, tiles 0-33) + sword tiles at $2D-$2E.
+ROM includes this file via chr_data.s into CHR banks 4-7 and 8-11.
+init_mmc3 maps CHR 1K banks 8-11 to PPU $1000-$1FFF (PPUCTRL_SPR_1000).
+
+### Link Walk Sprites (16x16 metatiles, 4 tiles each: TL, TR, BL, BR)
 
 | Index | Hex | Name | Description |
 |-------|-----|------|-------------|
-| 0 | $00 | Empty | Blank |
-| 1-4 | $01-$04 | Link Down | Link facing down (TL,TR,BL,BR) |
-| 5-8 | $05-$08 | Link Up | Link facing up (TL,TR,BL,BR) |
-| 9-12 | $09-$0C | Link Right | Link facing right (TL,TR,BL,BR) |
-| 13-14 | $0D-$0E | Link Walk | Walk animation legs (BL,BR alt) |
-| 15 | $0F | Octorok | Enemy: Octorok |
-| 16 | $10 | Moblin | Enemy: Moblin |
-| 17 | $11 | Keese | Enemy: Bat/Keese |
-| 18 | $12 | Zol | Enemy: Slime blob |
-| 19 | $13 | Heart Full | Full heart |
-| 20 | $14 | Heart Empty | Empty heart container |
-| 21 | $15 | Magic Full | Full magic bottle |
-| 22 | $16 | Magic Empty | Empty magic bottle |
-| 23 | $17 | Rupee | Currency |
-| 24 | $18 | Key | Dungeon key |
-| 25 | $19 | Bomb | Bomb |
-| 26 | $1A | Sword | Sword |
-| 27 | $1B | Shield | Shield |
-| 28 | $1C | Arrow | Arrow projectile |
-| 29 | $1D | Feather | Roc's Feather |
-| 30 | $1E | Sparkle 1 | Effect: sparkle frame 1 |
-| 31 | $1F | Sparkle 2 | Effect: sparkle frame 2 |
-| 32 | $20 | Explosion | Effect: explosion |
-| 33 | $21 | Shadow | Sprite shadow |
+| 0-3 | $00-$03 | walk_down_1 | Link facing down, walk frame 1 |
+| 4-7 | $04-$07 | walk_down_2 | Link facing down, walk frame 2 |
+| 8-11 | $08-$0B | walk_up_1 | Link facing up, walk frame 1 |
+| 12-15 | $0C-$0F | walk_up_2 | Link facing up, walk frame 2 |
+| 16-19 | $10-$13 | walk_left_1 | Link facing left, walk frame 1 |
+| 20-23 | $14-$17 | walk_left_2 | Link facing left, walk frame 2 |
+| 24-27 | $18-$1B | walk_right_1 | Link facing right, walk frame 1 |
+| 28-31 | $1C-$1F | walk_right_2 | Link facing right, walk frame 2 |
+
+### Equipment & Effect Sprites
+
+| Index | Hex | Name | Description |
+|-------|-----|------|-------------|
+| 32 | $20 | shield_front | Shield (front-facing) |
+| 33 | $21 | shield_left | Shield (side-facing) |
+| 34-44 | $22-$2C | (empty) | Reserved / unused |
+| 45 | $2D | sword_vert | Sword blade (vertical) |
+| 46 | $2E | sword_horiz | Sword blade (horizontal) |
+| 47-255 | $2F-$FF | (empty) | Reserved for enemies, items, effects |
+
+### Sprite Tile Table (player.s) Cross-Reference
+
+Code indexes into sprite_tile_table as: `(player_dir * 2) + player_anim_frame`
+Enums: DIR_UP=0, DIR_DOWN=1, DIR_LEFT=2, DIR_RIGHT=3
+
+| Direction | Frame 0 | Frame 1 | Base Tile |
+|-----------|---------|---------|-----------|
+| UP | walk_up_1 | walk_up_2 | $08, $0C |
+| DOWN | walk_down_1 | walk_down_2 | $00, $04 |
+| LEFT | walk_left_1 | walk_left_2 | $10, $14 |
+| RIGHT | walk_right_1 | walk_right_2 | $18, $1C |
+
+Sword tiles: SWORD_TILE_VERT=$2D, SWORD_TILE_HORIZ=$2E (combat.inc)
 
 ## HUD Tiles (hud.chr)
 
@@ -122,5 +137,6 @@
 
 - Trees are 16x16 (4 tiles: TL=$08, TR=$09, BL=$0A, BR=$0B)
 - Rocks are 16x16 (2 tiles: TL=$0D, TR=$0E)
-- Link is 16x16 (4 tiles per direction per frame)
-- Link facing left = Link facing right, H-flipped via OAM attribute bit
+- Link is 16x16 (4 tiles per direction per frame, 8 walk frames total)
+- Link has separate tiles for all 4 directions (no H-flip sharing)
+- Sword uses 2 tiles: vertical ($2D) and horizontal ($2E), flipped via OAM attributes
