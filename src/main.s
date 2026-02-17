@@ -15,6 +15,7 @@
 .include "bombs.inc"
 .include "hud.inc"
 .include "warps.inc"
+.include "inventory.inc"
 
 .segment "PRG_FIXED"
 
@@ -55,6 +56,12 @@
 
     cmp #GAME_STATE_PAUSED
     beq @state_paused
+
+    cmp #GAME_STATE_INVENTORY
+    beq @state_inventory
+
+    cmp #GAME_STATE_MAP_SCREEN
+    beq @state_map_screen
 
     cmp #GAME_STATE_GAME_OVER
     beq @state_game_over
@@ -104,6 +111,7 @@
     cmp #$01                ; Did a transition occur?
     bne @no_transition
     jsr hud_draw_full       ; Redraw HUD after screen load overwrote it
+    jsr mark_current_screen_visited  ; Track visited screens for minimap
 @no_transition:
 
     jmp @state_done
@@ -118,6 +126,16 @@
     beq @state_done
     lda #GAME_STATE_GAMEPLAY
     sta game_state
+    jmp @state_done
+
+; --- State: Inventory ---
+@state_inventory:
+    jsr inventory_update
+    jmp @state_done
+
+; --- State: Map Screen ---
+@state_map_screen:
+    jsr map_screen_update
     jmp @state_done
 
 ; --- State: Game Over ---

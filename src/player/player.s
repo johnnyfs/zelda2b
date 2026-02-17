@@ -5,6 +5,7 @@
 .include "globals.inc"
 .include "enums.inc"
 .include "combat.inc"
+.include "inventory.inc"
 
 PLAYER_SPEED_LO     = $80
 PLAYER_SPEED_HI     = $01
@@ -38,13 +39,21 @@ SCREEN_RIGHT        = 240
 .endproc
 
 .proc player_update
+    ; --- Start: open inventory ---
     lda pad1_pressed
     and #BUTTON_START
-    beq @no_pause
-    lda #GAME_STATE_PAUSED
-    sta game_state
+    beq @no_inventory
+    jsr inventory_open
     rts
-@no_pause:
+@no_inventory:
+
+    ; --- Select: open map screen ---
+    lda pad1_pressed
+    and #BUTTON_SELECT
+    beq @no_map
+    jsr map_screen_open
+    rts
+@no_map:
 
     ; --- Combat update (checks attack input, handles sword, damage) ---
     ; Returns carry set if player is attacking (suppress movement)

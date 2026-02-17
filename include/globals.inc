@@ -154,6 +154,7 @@ GLOBALS_INC = 1
 .global item_use_b
 .global item_give
 .global magic_consume
+.global mark_current_screen_visited
 
 ; -- map/warps.s --
 .global warp_init

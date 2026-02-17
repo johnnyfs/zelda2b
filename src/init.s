@@ -14,6 +14,7 @@
 .include "combat.inc"
 .include "bombs.inc"
 .include "hud.inc"
+.include "inventory.inc"
 
 .segment "PRG_FIXED"
 
@@ -102,6 +103,8 @@
     jsr combat_init         ; Initialize player combat state (HP, attack)
     jsr pickup_init         ; Clear all pickup slots
     jsr bomb_init           ; Clear bomb slots, set starting inventory
+    jsr item_system_init    ; Initialize item system (gives sword+bombs, clears visited)
+    jsr inventory_init      ; Initialize inventory cursor state
     jsr enemy_spawn_screen  ; Spawn test enemies on starting screen
 
     ; ----- Initialize HUD (status bar) -----
