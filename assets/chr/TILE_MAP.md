@@ -72,16 +72,18 @@ init_mmc3 maps CHR 1K banks 8-11 to PPU $1000-$1FFF (PPUCTRL_SPR_1000).
 
 ### Link Walk Sprites (16x16 metatiles, 4 tiles each: TL, TR, BL, BR)
 
-| Index | Hex | Name | Description |
-|-------|-----|------|-------------|
-| 0-3 | $00-$03 | walk_down_1 | Link facing down, walk frame 1 |
-| 4-7 | $04-$07 | walk_down_2 | Link facing down, walk frame 2 |
-| 8-11 | $08-$0B | walk_up_1 | Link facing up, walk frame 1 |
-| 12-15 | $0C-$0F | walk_up_2 | Link facing up, walk frame 2 |
-| 16-19 | $10-$13 | walk_left_1 | Link facing left, walk frame 1 |
-| 20-23 | $14-$17 | walk_left_2 | Link facing left, walk frame 2 |
-| 24-27 | $18-$1B | walk_right_1 | Link facing right, walk frame 1 |
-| 28-31 | $1C-$1F | walk_right_2 | Link facing right, walk frame 2 |
+**WARNING**: LINK_TILES.json mislabels left/right. The actual pixel data is:
+
+| Index | Hex | JSON Label | Actual Facing | Description |
+|-------|-----|------------|---------------|-------------|
+| 0-3 | $00-$03 | walk_down_1 | **DOWN** | Front-facing, eyes visible, frame 1 |
+| 4-7 | $04-$07 | walk_down_2 | **DOWN** | Front-facing, eyes visible, frame 2 |
+| 8-11 | $08-$0B | walk_up_1 | **UP** | Back-facing, no face, frame 1 |
+| 12-15 | $0C-$0F | walk_up_2 | **UP** | Back-facing, no face, frame 2 |
+| 16-19 | $10-$13 | walk_left_1 | **RIGHT** | Side profile facing right, frame 1 |
+| 20-23 | $14-$17 | walk_left_2 | **RIGHT** | Side profile facing right, frame 2 |
+| 24-27 | $18-$1B | walk_right_1 | **LEFT** | Side profile facing left, frame 1 |
+| 28-31 | $1C-$1F | walk_right_2 | **LEFT** | Side profile facing left, frame 2 |
 
 ### Equipment & Effect Sprites
 
@@ -99,12 +101,12 @@ init_mmc3 maps CHR 1K banks 8-11 to PPU $1000-$1FFF (PPUCTRL_SPR_1000).
 Code indexes into sprite_tile_table as: `(player_dir * 2) + player_anim_frame`
 Enums: DIR_UP=0, DIR_DOWN=1, DIR_LEFT=2, DIR_RIGHT=3
 
-| Direction | Frame 0 | Frame 1 | Base Tile |
-|-----------|---------|---------|-----------|
-| UP | walk_up_1 | walk_up_2 | $08, $0C |
-| DOWN | walk_down_1 | walk_down_2 | $00, $04 |
-| LEFT | walk_left_1 | walk_left_2 | $10, $14 |
-| RIGHT | walk_right_1 | walk_right_2 | $18, $1C |
+| Direction | CHR Tiles | Base Tile | Note |
+|-----------|-----------|-----------|------|
+| UP | $08-$0B, $0C-$0F | $08, $0C | Back-facing (json: walk_up) |
+| DOWN | $00-$03, $04-$07 | $00, $04 | Front-facing (json: walk_down) |
+| LEFT | $18-$1B, $1C-$1F | $18, $1C | Left-facing (json MISLABELS as walk_right) |
+| RIGHT | $10-$13, $14-$17 | $10, $14 | Right-facing (json MISLABELS as walk_left) |
 
 Sword tiles: SWORD_TILE_VERT=$2D, SWORD_TILE_HORIZ=$2E (combat.inc)
 
