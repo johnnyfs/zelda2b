@@ -119,6 +119,7 @@ inv_cursor_x:       .res 1              ; Cursor column in item grid (0-3)
 inv_cursor_y:       .res 1              ; Cursor row in item grid (0-3)
 inv_blink_timer:    .res 1              ; Cursor blink timer
 selected_b_item:    .res 1              ; Currently selected B-button item
+b_item_cooldown:    .res 1              ; B-item use cooldown (frames, 0=ready)
 player_keys:        .res 1              ; Key count
 player_arrows:      .res 1              ; Arrow count
 

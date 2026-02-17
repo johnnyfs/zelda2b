@@ -42,6 +42,8 @@
     ; Set default B-item to bombs
     lda #ITEM_BOMB
     sta selected_b_item
+    lda #$00
+    sta b_item_cooldown
 
     ; Initialize keys/arrows
     lda #$00
@@ -73,7 +75,20 @@
 ; ============================================================================
 ; Called when the player presses B during gameplay.
 ; Dispatches to the appropriate item handler based on selected_b_item.
+; Each handler sets b_item_cooldown to prevent rapid-fire reuse.
+;
+; Clobbers: A, X, Y
 ; ============================================================================
+
+; Cooldown values (in frames) for each item
+B_COOLDOWN_BOMB     = 30        ; ~0.5 sec (bomb fuse takes time anyway)
+B_COOLDOWN_BOW      = 12        ; Quick repeat
+B_COOLDOWN_CANDLE   = 20
+B_COOLDOWN_HOOKSHOT = 30
+B_COOLDOWN_HAMMER   = 15
+B_COOLDOWN_FLUTE    = 60        ; Long cooldown for warp
+B_COOLDOWN_POTION   = 30
+B_COOLDOWN_BOOMERANG = 20
 
 .proc item_use_b
     lda selected_b_item
@@ -92,6 +107,8 @@
     beq @use_flute
     cmp #ITEM_POTION
     beq @use_potion
+    cmp #ITEM_BOOMERANG
+    beq @use_boomerang
 
     ; Unknown or ITEM_NONE: do nothing
     rts
@@ -100,8 +117,10 @@
     ; Check if player has bombs
     lda player_bombs
     beq @done
-    ; bomb_place is defined in bombs.s
+    ; bomb_place is defined in bombs.s — handles decrement + spawn
     jsr bomb_place
+    lda #B_COOLDOWN_BOMB
+    sta b_item_cooldown
     jmp @done
 
 @use_bow:
@@ -109,7 +128,14 @@
     lda player_arrows
     beq @done
     dec player_arrows
-    ; Arrow projectile would be spawned here (TODO)
+    ; Sync arrow count to player_items
+    lda player_arrows
+    sta player_items + ITEM_ARROW
+    lda #B_COOLDOWN_BOW
+    sta b_item_cooldown
+    ; TODO: Spawn arrow projectile in player_dir direction
+    lda #$01
+    sta hud_dirty
     jmp @done
 
 @use_candle:
@@ -117,23 +143,43 @@
     lda #MAGIC_COST_CANDLE
     jsr magic_consume
     bcc @done               ; Not enough magic
-    ; Candle effect here (TODO)
+    lda #B_COOLDOWN_CANDLE
+    sta b_item_cooldown
+    ; TODO: Spawn candle flame projectile in player_dir direction
     jmp @done
 
 @use_hookshot:
     lda #MAGIC_COST_HOOKSHOT
     jsr magic_consume
     bcc @done
-    ; Hookshot effect here (TODO)
+    lda #B_COOLDOWN_HOOKSHOT
+    sta b_item_cooldown
+    ; TODO: Spawn hookshot projectile in player_dir direction
     jmp @done
 
 @use_hammer:
     ; Hammer is free to use (melee)
-    ; Hammer attack effect here (TODO)
+    lda #B_COOLDOWN_HAMMER
+    sta b_item_cooldown
+    ; TODO: Hammer ground-pound effect (break rocks, stun enemies)
     jmp @done
 
 @use_flute:
-    ; Flute effect (warp or summon) here (TODO)
+    ; Check if player owns flute
+    lda player_items + ITEM_FLUTE
+    beq @done
+    lda #B_COOLDOWN_FLUTE
+    sta b_item_cooldown
+    ; TODO: Flute warp/summon effect
+    jmp @done
+
+@use_boomerang:
+    ; Check if player owns boomerang
+    lda player_items + ITEM_BOOMERANG
+    beq @done
+    lda #B_COOLDOWN_BOOMERANG
+    sta b_item_cooldown
+    ; TODO: Spawn boomerang projectile that returns to player
     jmp @done
 
 @use_potion:
@@ -143,6 +189,8 @@
     dec player_items + ITEM_POTION
     lda player_max_magic
     sta player_magic
+    lda #B_COOLDOWN_POTION
+    sta b_item_cooldown
     lda #$01
     sta hud_dirty
 

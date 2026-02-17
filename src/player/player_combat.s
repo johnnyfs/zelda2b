@@ -11,6 +11,7 @@
 .include "combat.inc"
 .include "bombs.inc"
 .include "audio.inc"
+.include "inventory.inc"
 
 ; Overlap threshold for AABB collision (in pixels)
 ; Two 16x16 sprites overlap if their centers are within 14px
@@ -52,6 +53,12 @@ OVERLAP_THRESHOLD   = 14
 ; ============================================================================
 
 .proc combat_update
+    ; --- Decrement B-item cooldown if active ---
+    lda b_item_cooldown
+    beq @no_cooldown_tick
+    dec b_item_cooldown
+@no_cooldown_tick:
+
     ; --- Decrement invuln timer if active ---
     lda player_invuln_timer
     beq @no_invuln_tick
@@ -86,12 +93,15 @@ OVERLAP_THRESHOLD   = 14
     rts
 
 @no_attack:
-    ; --- Check for B button press (place bomb) ---
+    ; --- Check for B button press (use selected B-item) ---
     lda pad1_pressed
     and #BUTTON_B
-    beq @no_bomb
-    jsr bomb_place              ; Places bomb if inventory > 0 and slot free
-@no_bomb:
+    beq @no_b_item
+    ; Check cooldown to prevent rapid-fire
+    lda b_item_cooldown
+    bne @no_b_item
+    jsr item_use_b              ; Dispatch to selected B-item handler
+@no_b_item:
 
     ; Not attacking - check enemy contact damage
     jsr check_player_damage

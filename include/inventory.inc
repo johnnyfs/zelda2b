@@ -106,6 +106,7 @@ MAGIC_COST_CAPE     = 2         ; Per-frame cost
 .globalzp inv_cursor_y          ; Cursor row in item grid (0..INV_GRID_ROWS-1)
 .globalzp inv_blink_timer       ; Cursor blink animation timer
 .globalzp selected_b_item       ; ITEM_xxx ID currently assigned to B-button
+.globalzp b_item_cooldown       ; Frames until B-item can be used again (0=ready)
 .globalzp player_keys           ; Current key count
 .globalzp player_arrows         ; Current arrow count
 .globalzp player_magic          ; Current magic points (0-32)

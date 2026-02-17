@@ -56,8 +56,9 @@ ITEM_HAMMER     = 12
 ITEM_FLUTE      = 13
 ITEM_HOOKSHOT   = 14
 ITEM_MAGIC_CAPE = 15
+ITEM_BOOMERANG  = 16
 
-ITEM_COUNT      = 16
+ITEM_COUNT      = 17
 
 ; ============================================================================
 ; Enemy IDs (placeholder)

@@ -34,7 +34,7 @@ b_item_table:
     .byte ITEM_HAMMER       ; slot 4
     .byte ITEM_FLUTE        ; slot 5
     .byte ITEM_POTION       ; slot 6
-    .byte ITEM_NONE         ; slot 7  (empty)
+    .byte ITEM_BOOMERANG    ; slot 7
     .byte ITEM_NONE         ; slot 8  (empty)
     .byte ITEM_NONE         ; slot 9  (empty)
     .byte ITEM_NONE         ; slot 10 (empty)
@@ -60,6 +60,7 @@ item_portrait_tiles:
     .byte $60               ; ITEM_FLUTE
     .byte $64               ; ITEM_HOOKSHOT
     .byte $68               ; ITEM_MAGIC_CAPE (quest item)
+    .byte $6C               ; ITEM_BOOMERANG
 
 ; Quest item list (non-selectable items displayed in quest row)
 quest_item_list:
