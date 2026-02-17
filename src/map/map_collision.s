@@ -5,10 +5,17 @@
 ; Uses the same screen data and metatile table as the map renderer.
 ; No separate collision arrays - visual and collision are unified.
 ;
+; Hitbox: 6x6 pixels centered at Link's feet with per-direction adjustments:
+;   DOWN  - stop when toes touch wall (check y+16 edge)
+;   UP    - allow ~4px into wall for false perspective (check y+8 edge)
+;   LEFT  - allow ~1px overlap into wall
+;   RIGHT - allow ~1px overlap into wall
+;
 ; Input:  temp_2 = proposed X position (pixels)
 ;         temp_3 = proposed Y position (pixels, includes status bar offset)
+;         player_dir = current direction (0=UP, 1=DOWN, 2=LEFT, 3=RIGHT)
 ; Output: carry set = blocked (solid metatile), carry clear = walkable
-; Clobbers: A, Y
+; Clobbers: A, X, Y
 ; ============================================================================
 
 .include "nes.inc"
@@ -16,10 +23,24 @@
 .include "enums.inc"
 .include "map.inc"
 
-HITBOX_INSET = 2
-HITBOX_SIZE  = 12
-
 .segment "PRG_FIXED"
+
+; --------------------------------------------------------------------------
+; Directional hitbox offsets (added to sprite origin to get corner positions)
+; Sprite is 16x16. Base 6x6 box at feet: x+5..x+10, y+11..y+16
+;
+; Per-direction tuning:
+;   UP:    shift box up so head can poke into walls (y+8..y+13)
+;   DOWN:  standard feet box, stop at toes (y+11..y+16)
+;   LEFT:  shift box 1px left for slight wall overlap (x+4..x+9)
+;   RIGHT: shift box 1px right for slight wall overlap (x+6..x+11)
+; --------------------------------------------------------------------------
+
+; Table indexed by player_dir: [UP, DOWN, LEFT, RIGHT]
+hitbox_x_left:   .byte  5,  5,  4,  6   ; left X offset
+hitbox_x_right:  .byte 10, 10,  9, 11   ; right X offset
+hitbox_y_top:    .byte  8, 11, 11, 11   ; top Y offset
+hitbox_y_bottom: .byte 13, 16, 16, 16   ; bottom Y offset
 
 ; ============================================================================
 ; check_tile_solid - Check if a single pixel position is on a solid metatile
@@ -103,62 +124,75 @@ HITBOX_SIZE  = 12
 .endproc
 
 ; ============================================================================
-; check_collision - 4-corner hitbox collision check
+; check_collision - Directional 4-corner hitbox collision check
 ; ============================================================================
-; Checks all 4 corners of the player hitbox against metatile solidity.
-; Input:  temp_2 = proposed X, temp_3 = proposed Y
+; Checks all 4 corners of a 6x6 feet-centered hitbox against metatile solidity.
+; Hitbox shape varies by player_dir for Zelda-style false perspective feel:
+;   - Walking DOWN: toes stop at wall edge
+;   - Walking UP: head pokes ~4px into wall (top-down illusion)
+;   - Walking L/R: ~1px overlap allowed
+;
+; Input:  temp_2 = proposed X, temp_3 = proposed Y, player_dir = direction
 ; Output: carry set = blocked, carry clear = walkable
 ; Clobbers: A, X, Y
 ; ============================================================================
 
 .proc check_collision
+    ; Load direction index for table lookups
+    ldx player_dir
+
     ; --- Corner 1: Top-left ---
     lda temp_2
     clc
-    adc #HITBOX_INSET
-    ldy temp_3
-    iny                     ; +1 for inset (simplified from HITBOX_INSET for Y)
-    iny
+    adc hitbox_x_left, x
+    pha                     ; save X coord on stack
+    lda temp_3
+    clc
+    adc hitbox_y_top, x
+    tay                     ; Y = top Y pixel
+    pla                     ; A = left X pixel
     jsr check_tile_solid
     bcs @blocked
 
     ; --- Corner 2: Top-right ---
+    ldx player_dir
     lda temp_2
     clc
-    adc #(HITBOX_INSET + HITBOX_SIZE - 1)
-    ldy temp_3
-    iny
-    iny
+    adc hitbox_x_right, x
+    pha
+    lda temp_3
+    clc
+    adc hitbox_y_top, x
+    tay
+    pla
     jsr check_tile_solid
     bcs @blocked
 
     ; --- Corner 3: Bottom-left ---
+    ldx player_dir
     lda temp_2
     clc
-    adc #HITBOX_INSET
-    ldy temp_3
-    tya
+    adc hitbox_x_left, x
+    pha
+    lda temp_3
     clc
-    adc #(HITBOX_INSET + HITBOX_SIZE - 1)
+    adc hitbox_y_bottom, x
     tay
-    lda temp_2
-    clc
-    adc #HITBOX_INSET
+    pla
     jsr check_tile_solid
     bcs @blocked
 
     ; --- Corner 4: Bottom-right ---
+    ldx player_dir
     lda temp_2
     clc
-    adc #(HITBOX_INSET + HITBOX_SIZE - 1)
-    ldy temp_3
-    tya
+    adc hitbox_x_right, x
+    pha
+    lda temp_3
     clc
-    adc #(HITBOX_INSET + HITBOX_SIZE - 1)
+    adc hitbox_y_bottom, x
     tay
-    lda temp_2
-    clc
-    adc #(HITBOX_INSET + HITBOX_SIZE - 1)
+    pla
     jsr check_tile_solid
     bcs @blocked
 
