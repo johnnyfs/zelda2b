@@ -13,6 +13,7 @@
 .include "hud.inc"
 .include "warps.inc"
 .include "inventory.inc"
+.include "shop.inc"
 
 ; ============================================================================
 ; Zero Page Variables ($0000-$00FF)
@@ -125,6 +126,15 @@ player_arrows:      .res 1              ; Arrow count
 player_magic:       .res 1              ; Current magic points (0-32)
 player_max_magic:   .res 1              ; Max magic (bottles * 8)
 magic_bottles_count:.res 1              ; Number of magic bottles (0-4)
+
+; --- Shop state ---
+shop_active:        .res 1              ; Non-zero if current screen is a shop
+shop_id:            .res 1              ; Which shop data to use (0-MAX_SHOPS)
+shop_items_bought:  .res 1              ; Bitmask: bit 0/1/2 = items bought
+
+; --- Player currency ---
+player_rupees_lo:   .res 1              ; Rupees low byte (binary, 0-255)
+player_rupees_hi:   .res 1              ; Rupees high byte (for max 999)
 
 ; ============================================================================
 ; OAM Shadow Buffer ($0200-$02FF)

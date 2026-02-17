@@ -16,6 +16,7 @@
 .include "hud.inc"
 .include "warps.inc"
 .include "inventory.inc"
+.include "shop.inc"
 
 .segment "PRG_FIXED"
 
@@ -98,6 +99,12 @@
 
     ; Update HUD (checks for HP/magic changes, queues PPU buffer writes)
     jsr hud_update
+
+    ; Update shop system (purchase logic when in a shop screen)
+    jsr shop_update
+
+    ; Draw shop sprites (shopkeeper + items on floor)
+    jsr shop_draw_items
 
     ; Check for cave warp (door tile warps)
     jsr warp_check
