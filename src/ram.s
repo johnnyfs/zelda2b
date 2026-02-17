@@ -11,6 +11,8 @@
 .include "combat.inc"
 .include "bombs.inc"
 .include "hud.inc"
+.include "warps.inc"
+.include "inventory.inc"
 
 ; ============================================================================
 ; Zero Page Variables ($0000-$00FF)
@@ -108,6 +110,22 @@ bomb_state:         .res MAX_BOMBS      ; State (inactive/fuse/exploding/smoke)
 bomb_timer:         .res MAX_BOMBS      ; Countdown timer
 player_bombs:       .res 1              ; Current bomb inventory count
 
+; --- Warp system state ---
+warp_cooldown:      .res 1              ; Cooldown timer (prevents instant re-warp)
+
+; --- Inventory / item system state ---
+inv_cursor_x:       .res 1              ; Cursor column in item grid (0-3)
+inv_cursor_y:       .res 1              ; Cursor row in item grid (0-3)
+inv_blink_timer:    .res 1              ; Cursor blink timer
+selected_b_item:    .res 1              ; Currently selected B-button item
+player_keys:        .res 1              ; Key count
+player_arrows:      .res 1              ; Arrow count
+
+; --- Magic system ---
+player_magic:       .res 1              ; Current magic points (0-32)
+player_max_magic:   .res 1              ; Max magic (bottles * 8)
+magic_bottles_count:.res 1              ; Number of magic bottles (0-4)
+
 ; ============================================================================
 ; OAM Shadow Buffer ($0200-$02FF)
 ; ============================================================================
@@ -131,3 +149,9 @@ ppu_buffer_len:     .res 1      ; Current length of buffered data
 ; Each byte is 0 (passable) or 1 (solid), indexed by metatile_row * 16 + metatile_col.
 ; Derived from metatile attribute byte bit 7 — same data that drives visual rendering.
 collision_map:      .res MAP_SCREEN_SIZE  ; 224 bytes (16x14)
+
+; --- Player item ownership (1 byte per item: 0=not owned, 1+=owned/count) ---
+player_items:       .res ITEM_COUNT       ; 16 bytes
+
+; --- Visited screens bitmask (1 bit per screen, up to 64 screens) ---
+visited_screens:    .res 8                ; 8 bytes = 64 screen bits

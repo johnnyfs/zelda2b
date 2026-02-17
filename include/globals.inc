@@ -138,4 +138,27 @@ GLOBALS_INC = 1
 ; -- data/test_screen.s --
 .global load_test_screen
 
+; -- ui/inventory.s --
+.global inventory_init
+.global inventory_open
+.global inventory_update
+.global inventory_close
+
+; -- ui/map_screen.s --
+.global map_screen_open
+.global map_screen_update
+.global map_screen_close
+
+; -- items/item_system.s --
+.global item_system_init
+.global item_use_b
+.global item_give
+.global magic_consume
+
+; -- map/warps.s --
+.global warp_init
+.global warp_check
+.global warp_table
+.globalzp warp_cooldown
+
 .endif ; GLOBALS_INC

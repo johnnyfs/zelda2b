@@ -52,6 +52,7 @@ SOURCES := \
 	$(SRCDIR)/map/map_collision.s \
 	$(SRCDIR)/map/map_engine.s \
 	$(SRCDIR)/map/map_transition.s \
+	$(SRCDIR)/map/warps.s \
 	$(SRCDIR)/data/palettes.s \
 	$(SRCDIR)/data/test_screen.s \
 	$(SRCDIR)/data/metatiles.s \
