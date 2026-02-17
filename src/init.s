@@ -110,6 +110,16 @@
     lda #$00
     sta PPUMASK
     jsr hud_init            ; Write HUD tiles to nametable rows 0-1
+
+    ; Reset PPU scroll after hud_init VRAM writes.
+    ; hud_init writes to attribute table ($23C0+), leaving the PPU address
+    ; latch dirty. Without this reset, the first frame renders with a
+    ; corrupted scroll position, making the HUD invisible.
+    lda PPUSTATUS           ; Reset PPU address latch
+    lda #$00
+    sta PPUSCROLL
+    sta PPUSCROLL
+
     lda ppu_mask_shadow
     sta PPUMASK             ; Re-enable rendering
 
