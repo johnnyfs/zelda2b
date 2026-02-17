@@ -56,6 +56,8 @@ SOURCES := \
 	$(SRCDIR)/map/map_engine.s \
 	$(SRCDIR)/map/map_transition.s \
 	$(SRCDIR)/map/warps.s \
+	$(SRCDIR)/npc/shop.s \
+	$(SRCDIR)/data/shop_data.s \
 	$(SRCDIR)/data/palettes.s \
 	$(SRCDIR)/data/test_screen.s \
 	$(SRCDIR)/data/metatiles.s \

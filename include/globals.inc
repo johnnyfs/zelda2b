@@ -162,4 +162,15 @@ GLOBALS_INC = 1
 .global warp_table
 .globalzp warp_cooldown
 
+; -- npc/shop.s --
+.global shop_init
+.global shop_enter
+.global shop_update
+.global shop_draw_items
+.global shop_draw_prices
+
+; -- data/shop_data.s --
+.global shop_data_table
+.global shop_screen_table
+
 .endif ; GLOBALS_INC
