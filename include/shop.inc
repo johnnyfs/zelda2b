@@ -34,6 +34,12 @@ SHOP_TILE_POTION    = $2B
 FONT_TILE_A         = $40
 FONT_TILE_0         = $5A
 FONT_TILE_BLANK     = $00
+FONT_TILE_COLON     = $64       ; Colon character tile
+
+; Rupee counter nametable location (row 26, col 10)
+; Row 26 = $23, offset = 26*32+10 = 842 = $034A => PPU addr = $2000+$034A = $234A
+RUPEE_DISP_ADDR_HI  = $23
+RUPEE_DISP_ADDR_LO  = $4A
 
 ; Shop Sub-States
 SHOP_SUBSTATE_INIT      = 0
@@ -58,6 +64,7 @@ SHOP_SUBSTATE_BROWSE    = 1
 .global shop_update
 .global shop_draw_items
 .global shop_draw_prices
+.global shop_update_rupee_display
 .global shop_data_table
 .global shop_screen_table
 

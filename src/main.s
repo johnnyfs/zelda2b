@@ -106,6 +106,9 @@
     ; Draw shop sprites (shopkeeper + items on floor)
     jsr shop_draw_items
 
+    ; Update rupee counter display (queues PPU buffer write if in shop)
+    jsr shop_update_rupee_display
+
     ; Check for cave warp (door tile warps)
     jsr warp_check
     cmp #$01                ; Did a warp occur?
