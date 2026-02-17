@@ -71,5 +71,6 @@ HUD_ROW1_ADDR           = $2020     ; Nametable row 1
 .global hud_init                    ; Write full HUD to nametable (rendering off)
 .global hud_update                  ; Check for changes, queue buffer writes
 .global hud_draw_full               ; Redraw entire HUD via PPU buffer
+.global hud_write_vram              ; Write 64 HUD tiles to PPUDATA (no addr setup)
 
 .endif ; HUD_INC

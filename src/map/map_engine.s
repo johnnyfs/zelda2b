@@ -20,6 +20,7 @@
 .include "globals.inc"
 .include "enums.inc"
 .include "map.inc"
+.include "hud.inc"
 
 .segment "PRG_FIXED"
 
@@ -78,6 +79,11 @@
     lda #$00
     sta PPUMASK
 
+    ; --- Clear PPU buffer to prevent NMI race condition ---
+    ; If NMI fires during our VRAM writes and processes a stale buffer,
+    ; it would corrupt the PPU address. Clear it now while rendering is off.
+    sta ppu_buffer_len
+
     ; --- Set up pointer to screen data ---
     ; ptr_lo/ptr_hi = address of screen data
     lda screen_ptrs_lo, x
@@ -92,15 +98,11 @@
     lda #$00
     sta PPUADDR
 
-    ; --- Write status bar (2 tile rows = 64 tiles) ---
-    ; Fill with tile $00 (blank) for now — status bar rendering
-    ; will be implemented later with health/item display
-    lda #$00
-    ldx #64                 ; 2 rows x 32 tiles
-@status_loop:
-    sta PPUDATA
-    dex
-    bne @status_loop
+    ; --- Write HUD tiles directly to status bar area ---
+    ; Instead of writing 64 blank tiles (which erases the HUD), we
+    ; call hud_write_vram to render the actual HUD content in place.
+    ; This avoids the 1-frame blank flicker between screen loads.
+    jsr hud_write_vram
 
     ; --- Decode metatiles row by row ---
     ; PPU address is now at $2040 (start of map area)
@@ -292,7 +294,7 @@
     asl a
     asl a                   ; A = attr_row * 4 = tile_row_base
     cmp #$02                ; < 2 = status bar
-    bcc @tl_zero
+    bcc @tl_hud             ; Use HUD palette for status bar area
     ; metatile_row = (tile_row_base - 2) / 2
     sec
     sbc #$02
@@ -313,6 +315,9 @@
     lda (ptr_lo), y         ; metatile ID
     jsr @get_palette
     jmp @tl_store
+@tl_hud:
+    lda #HUD_PALETTE        ; Palette 3 for HUD area
+    jmp @tl_store
 @tl_zero:
     lda #$00
 @tl_store:
@@ -323,7 +328,7 @@
     asl a
     asl a
     cmp #$02
-    bcc @tr_zero
+    bcc @tr_hud             ; Use HUD palette for status bar area
     sec
     sbc #$02
     lsr a
@@ -343,6 +348,9 @@
     tay
     lda (ptr_lo), y
     jsr @get_palette
+    jmp @tr_store
+@tr_hud:
+    lda #HUD_PALETTE        ; Palette 3 for HUD area
     jmp @tr_store
 @tr_zero:
     lda #$00
