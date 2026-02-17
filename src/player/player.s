@@ -452,19 +452,30 @@ SCREEN_RIGHT        = 240
     rts
 .endproc
 
+; ============================================================================
 ; Sprite tile table: base tile (TL) for each direction + animation frame.
-; Tile indices from LINK_TILES.json (LA DX ripped sprites, 34 tiles).
-; Each direction has 2 walk frames, 4 tiles each (TL, TR, BL, BR).
-; Draw routine adds: TR=base+1, BL=base+2, BR=base+3.
+; ============================================================================
+; Source: sprite_tiles.chr, layout from LINK_TILES.json (LA DX ripped).
+; CHR layout (0-indexed, each group is a 16x16 metatile = 4 tiles):
+;   $00-$03 walk_down_1   $04-$07 walk_down_2
+;   $08-$0B walk_up_1     $0C-$0F walk_up_2
+;   $10-$13 walk_left_1   $14-$17 walk_left_2
+;   $18-$1B walk_right_1  $1C-$1F walk_right_2
+;   $20 shield_front  $21 shield_left  $2D sword_vert  $2E sword_horiz
+;
+; Direction enums (enums.inc): DIR_UP=0 DIR_DOWN=1 DIR_LEFT=2 DIR_RIGHT=3
+; Table index = (player_dir * 2) + player_anim_frame
+; Draw routine assembles 16x16: TL=base, TR=base+1, BL=base+2, BR=base+3
+; ============================================================================
 sprite_tile_table:
-    .byte $08, $0C    ; DIR_UP    frame 0 (walk_up_1), frame 1 (walk_up_2)
-    .byte $00, $04    ; DIR_DOWN  frame 0 (walk_down_1), frame 1 (walk_down_2)
-    .byte $10, $14    ; DIR_LEFT  frame 0 (walk_left_1), frame 1 (walk_left_2)
-    .byte $18, $1C    ; DIR_RIGHT frame 0 (walk_right_1), frame 1 (walk_right_2)
+    .byte $08, $0C    ; DIR_UP(0)    walk_up_1, walk_up_2
+    .byte $00, $04    ; DIR_DOWN(1)  walk_down_1, walk_down_2
+    .byte $10, $14    ; DIR_LEFT(2)  walk_left_1, walk_left_2
+    .byte $18, $1C    ; DIR_RIGHT(3) walk_right_1, walk_right_2
 
-; Attack body tile table: one entry per direction (same body tile as walk frame 0)
+; Attack body tile table: indexed by player_dir, uses walk frame 0 body.
 attack_tile_table:
-    .byte $08         ; DIR_UP    attack body = walk_up_1
-    .byte $00         ; DIR_DOWN  attack body = walk_down_1
-    .byte $10         ; DIR_LEFT  attack body = walk_left_1
-    .byte $18         ; DIR_RIGHT attack body = walk_right_1
+    .byte $08         ; DIR_UP(0)    walk_up_1
+    .byte $00         ; DIR_DOWN(1)  walk_down_1
+    .byte $10         ; DIR_LEFT(2)  walk_left_1
+    .byte $18         ; DIR_RIGHT(3) walk_right_1
