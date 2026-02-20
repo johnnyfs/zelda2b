@@ -1,0 +1,24 @@
+{
+  "enemies": [
+    {"name": "Octorok", "hp": 2, "damage": 1, "speed": 1, "behavior": 0, "drop_table": 0},
+    {"name": "Moblin", "hp": 3, "damage": 2, "speed": 1, "behavior": 1, "drop_table": 1},
+    {"name": "Keese", "hp": 1, "damage": 1, "speed": 2, "behavior": 2, "drop_table": 0},
+    {"name": "Stalfos", "hp": 3, "damage": 2, "speed": 1, "behavior": 3, "drop_table": 1},
+    {"name": "Tektite", "hp": 2, "damage": 1, "speed": 2, "behavior": 4, "drop_table": 0},
+    {"name": "Leever", "hp": 2, "damage": 1, "speed": 1, "behavior": 5, "drop_table": 0},
+    {"name": "Zora", "hp": 3, "damage": 2, "speed": 0, "behavior": 6, "drop_table": 1},
+    {"name": "Darknut", "hp": 6, "damage": 3, "speed": 1, "behavior": 7, "drop_table": 2},
+    {"name": "IronKnuckle", "hp": 8, "damage": 4, "speed": 1, "behavior": 8, "drop_table": 3},
+    {"name": "Wizzrobe", "hp": 4, "damage": 3, "speed": 0, "behavior": 9, "drop_table": 2},
+    {"name": "BubbleRed", "hp": 255, "damage": 0, "speed": 2, "behavior": 10, "drop_table": 255},
+    {"name": "BubbleBlue", "hp": 255, "damage": 0, "speed": 2, "behavior": 11, "drop_table": 255},
+    {"name": "BossHorsehead", "hp": 16, "damage": 4, "speed": 1, "behavior": 128, "drop_table": 4},
+    {"name": "BossHelmethead", "hp": 20, "damage": 4, "speed": 1, "behavior": 129, "drop_table": 4},
+    {"name": "BossRebonack", "hp": 24, "damage": 5, "speed": 2, "behavior": 130, "drop_table": 4},
+    {"name": "BossCarock", "hp": 20, "damage": 4, "speed": 0, "behavior": 131, "drop_table": 4},
+    {"name": "BossGooma", "hp": 28, "damage": 5, "speed": 1, "behavior": 132, "drop_table": 4},
+    {"name": "BossBarba", "hp": 24, "damage": 5, "speed": 1, "behavior": 133, "drop_table": 4},
+    {"name": "BossThunderbird", "hp": 32, "damage": 6, "speed": 2, "behavior": 134, "drop_table": 4},
+    {"name": "BossDarkLink", "hp": 32, "damage": 4, "speed": 2, "behavior": 135, "drop_table": 4}
+  ]
+}
