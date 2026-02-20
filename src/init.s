@@ -82,59 +82,28 @@
     ; ----- Initialize MMC3 mapper -----
     jsr init_mmc3
 
-    ; ----- Initialize game state -----
-    lda #GAME_STATE_GAMEPLAY
+    ; ----- Start in TITLE state -----
+    lda #GAME_STATE_TITLE
     sta game_state
 
-    ; ----- Initialize player (via player module) -----
+    ; ----- Initialize player (will be used when gameplay starts) -----
     jsr player_init
 
     ; ----- Load initial palettes -----
     jsr ppu_load_palette
 
-    ; ----- Set PPU shadow registers before map_init -----
-    ; map_init disables/re-enables rendering, needs mask shadow set
+    ; ----- Set PPU shadow registers -----
     lda #PPUMASK_RENDER_ON
     sta ppu_mask_shadow
-
-    ; ----- Initialize map engine and load starting screen -----
-    jsr map_init
-
-    ; ----- Initialize combat system -----
-    jsr combat_init         ; Initialize player combat state (HP, attack)
-    jsr pickup_init         ; Clear all pickup slots
-    jsr bomb_init           ; Clear bomb slots, set starting inventory
-    jsr item_system_init    ; Initialize item system (gives sword+bombs, clears visited)
-    jsr inventory_init      ; Initialize inventory cursor state
-    jsr dialog_init         ; Initialize dialog/NPC system
-    jsr enemy_spawn_screen  ; Spawn test enemies on starting screen
-    jsr npc_spawn_screen    ; Spawn NPCs for starting screen
-
-    ; ----- Initialize HUD (status bar) -----
-    ; Rendering must be off for direct VRAM writes.
-    ; map_init re-enabled rendering, so disable it briefly.
-    lda #$00
-    sta PPUMASK
-    jsr hud_init            ; Write HUD tiles to nametable rows 0-1
-
-    ; Reset PPU scroll after hud_init VRAM writes.
-    ; hud_init writes to attribute table ($23C0+), leaving the PPU address
-    ; latch dirty. Without this reset, the first frame renders with a
-    ; corrupted scroll position, making the HUD invisible.
-    lda PPUSTATUS           ; Reset PPU address latch
-    lda #$00
-    sta PPUSCROLL
-    sta PPUSCROLL
-
-    lda ppu_mask_shadow
-    sta PPUMASK             ; Re-enable rendering
 
     ; ----- Initialize audio system -----
     jsr audio_init          ; Set up FamiStudio engine with music + SFX data
 
-    ; ----- Start overworld music -----
-    lda #$00                ; Song 0 = overworld theme
-    jsr audio_play_song     ; Begin music playback
+    ; ----- Initialize dialog system (needed for NPC data structures) -----
+    jsr dialog_init
+
+    ; ----- Show title screen -----
+    jsr title_screen_init   ; Draw "ZELDA 2B" / "PRESS START" on black bg
 
     ; ----- Enable PPU rendering -----
     lda #PPUCTRL_NMI_ON | PPUCTRL_BG_0000 | PPUCTRL_SPR_1000

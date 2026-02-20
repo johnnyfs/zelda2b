@@ -203,4 +203,8 @@ GLOBALS_INC = 1
 .global npc_dialog_id
 .global dialog_line_buf
 
+; -- ui/title_screen.s --
+.global title_screen_init
+.global title_screen_to_gameplay
+
 .endif ; GLOBALS_INC
