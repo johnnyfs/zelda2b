@@ -14,6 +14,7 @@
 .include "warps.inc"
 .include "inventory.inc"
 .include "shop.inc"
+.include "dialog.inc"
 
 ; ============================================================================
 ; Zero Page Variables ($0000-$00FF)
@@ -136,6 +137,19 @@ shop_items_bought:  .res 1              ; Bitmask: bit 0/1/2 = items bought
 player_rupees_lo:   .res 1              ; Rupees low byte (binary, 0-255)
 player_rupees_hi:   .res 1              ; Rupees high byte (for max 999)
 
+; --- Dialog system state ---
+dialog_state:       .res 1              ; Dialog sub-state (idle/drawing/waiting/closing)
+dialog_id:          .res 1              ; Current dialog ID
+dialog_ptr_lo:      .res 1              ; Pointer to current char in string (lo)
+dialog_ptr_hi:      .res 1              ; Pointer to current char in string (hi)
+dialog_char_timer:  .res 1              ; Typewriter delay counter
+dialog_line:        .res 1              ; Current line (0 or 1)
+dialog_col:         .res 1              ; Current column position
+dialog_page:        .res 1              ; Current page number
+
+; --- NPC system state ---
+npc_count:          .res 1              ; Number of active NPCs on this screen
+
 ; ============================================================================
 ; OAM Shadow Buffer ($0200-$02FF)
 ; ============================================================================
@@ -152,7 +166,7 @@ oam_buffer:         .res 256    ; 64 sprites x 4 bytes each (accessed at $0200)
 .segment "RAM"
 
 ; --- PPU write buffer (for deferred VRAM writes during NMI) ---
-ppu_buffer:         .res 96     ; PPU write buffer (96 bytes, HUD needs ~44)
+ppu_buffer:         .res 128    ; PPU write buffer (128 bytes, dialog box needs ~70)
 ppu_buffer_len:     .res 1      ; Current length of buffered data
 
 ; --- Collision map (built from metatile solid flags during screen load) ---
@@ -165,3 +179,12 @@ player_items:       .res ITEM_COUNT       ; 16 bytes
 
 ; --- Visited screens bitmask (1 bit per screen, up to 64 screens) ---
 visited_screens:    .res 8                ; 8 bytes = 64 screen bits
+
+; --- NPC parallel arrays (MAX_NPCS = 4) ---
+npc_x:              .res MAX_NPCS         ; NPC X positions
+npc_y:              .res MAX_NPCS         ; NPC Y positions
+npc_tile:           .res MAX_NPCS         ; NPC sprite tile indices
+npc_dialog_id:      .res MAX_NPCS         ; NPC dialog IDs
+
+; --- Dialog line buffer (for PPU writes) ---
+dialog_line_buf:    .res DIALOG_TEXT_WIDTH ; 28 bytes
