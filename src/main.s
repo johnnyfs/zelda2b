@@ -15,12 +15,14 @@
 
 .include "nes.inc"
 .include "globals.inc"
+.include "audio.inc"
 
 .import gamepad_read
 .import sprite_clear, sprite_put
 .import ppu_buf_reset
 .import metatile_fill_screen
 .import mmc3_init
+.import audio_init, audio_update, audio_play_sfx
 
 .export main_init, main_loop
 
@@ -40,6 +42,9 @@ player_dir:     .res 1     ; Facing direction (0=down, 1=up, 2=right, 3=left)
 .proc main_init
     ; Initialize MMC3
     jsr mmc3_init
+
+    ; Initialize audio
+    jsr audio_init
 
     ; Set initial game state
     lda #GAME_STATE_PLAY
@@ -335,6 +340,8 @@ player_dir:     .res 1     ; Facing direction (0=down, 1=up, 2=right, 3=left)
 @play:
     jsr state_play
 
+@draw_done:
+    jsr audio_update
 @draw_done:
     jmp @loop
 .endproc

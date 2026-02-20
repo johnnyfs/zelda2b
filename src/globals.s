@@ -56,6 +56,11 @@ ptr1_hi:        .res 1
 mmc3_bank_select: .res 1
 current_prg_bank: .res 1
 
+; --- Player Stats (for HUD) ---
+.export player_hp, player_hp_max
+player_hp:       .res 1
+player_hp_max:   .res 1
+
 ; ============================================================================
 ; RAM Variables (slower access, more space)
 ; ============================================================================
