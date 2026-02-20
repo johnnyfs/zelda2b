@@ -1,0 +1,33 @@
+{
+  "name": "cave_metatiles",
+  "metatiles": [
+    {"name": "floor_dark", "tl": 0, "tr": 0, "bl": 0, "br": 0, "attr": 0},
+    {"name": "floor_cave", "tl": 1, "tr": 1, "bl": 1, "br": 1, "attr": 0},
+    {"name": "wall_rock_1", "tl": 2, "tr": 2, "bl": 2, "br": 2, "attr": 4},
+    {"name": "wall_rock_2", "tl": 3, "tr": 3, "bl": 3, "br": 3, "attr": 4},
+    {"name": "wall_rough", "tl": 4, "tr": 4, "bl": 4, "br": 4, "attr": 4},
+    {"name": "wall_n", "tl": 5, "tr": 5, "bl": 2, "br": 2, "attr": 4},
+    {"name": "wall_s", "tl": 2, "tr": 2, "bl": 6, "br": 6, "attr": 4},
+    {"name": "wall_w", "tl": 7, "tr": 2, "bl": 7, "br": 2, "attr": 4},
+    {"name": "wall_e", "tl": 2, "tr": 8, "bl": 2, "br": 8, "attr": 4},
+    {"name": "corner_nw", "tl": 25, "tr": 5, "bl": 7, "br": 2, "attr": 4},
+    {"name": "corner_ne", "tl": 5, "tr": 26, "bl": 2, "br": 8, "attr": 4},
+    {"name": "corner_sw", "tl": 7, "tr": 2, "bl": 27, "br": 6, "attr": 4},
+    {"name": "corner_se", "tl": 2, "tr": 8, "bl": 6, "br": 28, "attr": 4},
+    {"name": "stalactite_small", "tl": 9, "tr": 0, "bl": 0, "br": 0, "attr": 0},
+    {"name": "stalactite_large", "tl": 10, "tr": 0, "bl": 0, "br": 0, "attr": 0},
+    {"name": "stalagmite_small", "tl": 0, "tr": 0, "bl": 11, "br": 0, "attr": 4},
+    {"name": "stalagmite_large", "tl": 0, "tr": 0, "bl": 12, "br": 0, "attr": 4},
+    {"name": "water_cave", "tl": 13, "tr": 13, "bl": 13, "br": 13, "attr": 8},
+    {"name": "water_edge_n", "tl": 14, "tr": 14, "bl": 13, "br": 13, "attr": 8},
+    {"name": "water_edge_s", "tl": 13, "tr": 13, "bl": 15, "br": 15, "attr": 8},
+    {"name": "lava", "tl": 16, "tr": 16, "bl": 16, "br": 16, "attr": 24},
+    {"name": "lava_anim", "tl": 17, "tr": 17, "bl": 17, "br": 17, "attr": 24},
+    {"name": "lava_edge_n", "tl": 18, "tr": 18, "bl": 16, "br": 16, "attr": 24},
+    {"name": "lava_edge_s", "tl": 16, "tr": 16, "bl": 19, "br": 19, "attr": 24},
+    {"name": "rock_large", "tl": 21, "tr": 22, "bl": 23, "br": 24, "attr": 4},
+    {"name": "pebble_1", "tl": 30, "tr": 0, "bl": 0, "br": 0, "attr": 0},
+    {"name": "pebble_2", "tl": 31, "tr": 0, "bl": 0, "br": 0, "attr": 0},
+    {"name": "crack", "tl": 29, "tr": 0, "bl": 0, "br": 0, "attr": 0}
+  ]
+}

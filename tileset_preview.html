@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Zelda 2B Tilesets Preview</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #222;
+            color: #fff;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #ffd700;
+        }
+        .tileset-section {
+            margin: 30px 0;
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .tileset-section h2 {
+            color: #4a9eff;
+            margin-top: 0;
+        }
+        .tileset-info {
+            margin: 10px 0;
+            font-size: 14px;
+            color: #aaa;
+        }
+        .tileset-preview {
+            background: #000;
+            padding: 10px;
+            border-radius: 4px;
+            display: inline-block;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        img {
+            display: block;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .stat-box {
+            background: #444;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4a9eff;
+        }
+        .metatile-info {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        .metatile-info h3 {
+            margin: 0 0 10px 0;
+            color: #ffa500;
+            font-size: 16px;
+        }
+        .metatile-list {
+            columns: 3;
+            column-gap: 20px;
+        }
+        .metatile-item {
+            break-inside: avoid;
+            margin: 3px 0;
+            color: #bbb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🗡️ Zelda 2B NES Tilesets 🗡️</h1>
+    <p style="text-align: center; color: #aaa;">
+        All tilesets designed for NES hardware (8x8 tiles, 4 colors per tile)
+    </p>
+
+    <!-- Overworld Tileset -->
+    <div class="tileset-section">
+        <h2>🌍 Overworld Tileset</h2>
+        <p class="tileset-info">
+            Main outdoor environment — grass, trees, water, rocks, houses, caves, bridges
+        </p>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-label">Tiles</div>
+                <div class="stat-value">256</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">CHR Size</div>
+                <div class="stat-value">4KB</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Metatiles</div>
+                <div class="stat-value">35</div>
+            </div>
+        </div>
+
+        <div class="tileset-preview">
+            <img src="assets/tilesets/overworld_preview.png" alt="Overworld Tileset">
+        </div>
+
+        <div class="metatile-info">
+            <h3>Available Metatiles</h3>
+            <div class="metatile-list">
+                <div class="metatile-item">• grass_plain</div>
+                <div class="metatile-item">• grass_light</div>
+                <div class="metatile-item">• grass_medium</div>
+                <div class="metatile-item">• grass_dense</div>
+                <div class="metatile-item">• dirt_path</div>
+                <div class="metatile-item">• water_still</div>
+                <div class="metatile-item">• water_anim</div>
+                <div class="metatile-item">• water_shore_n/s/e/w</div>
+                <div class="metatile-item">• water_corner_nw/ne/sw/se</div>
+                <div class="metatile-item">• tree</div>
+                <div class="metatile-item">• bush</div>
+                <div class="metatile-item">• rock_large</div>
+                <div class="metatile-item">• rock_small</div>
+                <div class="metatile-item">• mountain_wall_l/r</div>
+                <div class="metatile-item">• house_wall</div>
+                <div class="metatile-item">• house_roof</div>
+                <div class="metatile-item">• house_door</div>
+                <div class="metatile-item">• bridge_h/v</div>
+                <div class="metatile-item">• cave_entrance</div>
+                <div class="metatile-item">• fence_h/v</div>
+                <div class="metatile-item">• sand</div>
+                <div class="metatile-item">• flower</div>
+                <div class="metatile-item">• stairs_up</div>
+                <div class="metatile-item">• sign_post</div>
+                <div class="metatile-item">• stone_tile</div>
+                <div class="metatile-item">• tall_grass</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Palace Tileset -->
+    <div class="tileset-section">
+        <h2>🏛️ Palace/Dungeon Tileset</h2>
+        <p class="tileset-info">
+            Indoor dungeon environment — stone walls, doors, pits, torches, statues, chests
+        </p>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-label">Tiles</div>
+                <div class="stat-value">128</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">CHR Size</div>
+                <div class="stat-value">4KB</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Metatiles</div>
+                <div class="stat-value">32</div>
+            </div>
+        </div>
+
+        <div class="tileset-preview">
+            <img src="assets/tilesets/palace_preview.png" alt="Palace Tileset">
+        </div>
+
+        <div class="metatile-info">
+            <h3>Available Metatiles</h3>
+            <div class="metatile-list">
+                <div class="metatile-item">• floor_empty/plain/cracked/pattern</div>
+                <div class="metatile-item">• floor_decor_1/2</div>
+                <div class="metatile-item">• wall_n/s/e/w</div>
+                <div class="metatile-item">• wall_solid</div>
+                <div class="metatile-item">• wall_corner_nw/ne/sw/se</div>
+                <div class="metatile-item">• wall_brick</div>
+                <div class="metatile-item">• door_closed</div>
+                <div class="metatile-item">• door_open</div>
+                <div class="metatile-item">• door_locked</div>
+                <div class="metatile-item">• door_key</div>
+                <div class="metatile-item">• pillar</div>
+                <div class="metatile-item">• stairs_up/down</div>
+                <div class="metatile-item">• pit</div>
+                <div class="metatile-item">• torch_off/on</div>
+                <div class="metatile-item">• statue</div>
+                <div class="metatile-item">• chest_closed/open</div>
+                <div class="metatile-item">• block_push</div>
+                <div class="metatile-item">• water_dungeon</div>
+                <div class="metatile-item">• lava</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cave Tileset -->
+    <div class="tileset-section">
+        <h2>⛰️ Cave Tileset</h2>
+        <p class="tileset-info">
+            Natural cave environment — rough rock walls, stalactites/stalagmites, underground water, lava
+        </p>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-label">Tiles</div>
+                <div class="stat-value">64</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">CHR Size</div>
+                <div class="stat-value">4KB</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Metatiles</div>
+                <div class="stat-value">28</div>
+            </div>
+        </div>
+
+        <div class="tileset-preview">
+            <img src="assets/tilesets/cave_preview.png" alt="Cave Tileset">
+        </div>
+
+        <div class="metatile-info">
+            <h3>Available Metatiles</h3>
+            <div class="metatile-list">
+                <div class="metatile-item">• floor_dark</div>
+                <div class="metatile-item">• floor_cave</div>
+                <div class="metatile-item">• wall_rock_1/2</div>
+                <div class="metatile-item">• wall_rough</div>
+                <div class="metatile-item">• wall_n/s/e/w</div>
+                <div class="metatile-item">• corner_nw/ne/sw/se</div>
+                <div class="metatile-item">• stalactite_small/large</div>
+                <div class="metatile-item">• stalagmite_small/large</div>
+                <div class="metatile-item">• water_cave</div>
+                <div class="metatile-item">• water_edge_n/s</div>
+                <div class="metatile-item">• lava</div>
+                <div class="metatile-item">• lava_anim</div>
+                <div class="metatile-item">• lava_edge_n/s</div>
+                <div class="metatile-item">• rock_large</div>
+                <div class="metatile-item">• pebble_1/2</div>
+                <div class="metatile-item">• crack</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 40px; padding: 20px; background: #1a1a1a; border-radius: 8px; text-align: center;">
+        <h3 style="color: #4a9eff;">Technical Details</h3>
+        <p style="color: #aaa;">
+            Each tileset is stored as a 4KB CHR bank (256 tiles max).<br>
+            Tiles are 8×8 pixels with 4 colors from a palette.<br>
+            Metatiles are 16×16 (2×2 tiles) and serve as the basic map-building unit.<br>
+            The 'attr' byte in metatile definitions controls palette (bits 0-1) and collision flags (bits 2-4).
+        </p>
+        <p style="color: #666; font-size: 12px; margin-top: 20px;">
+            Created by TilesetArtist • Zelda 2B Project • NES CHR Format
+        </p>
+    </div>
+</body>
+</html>
