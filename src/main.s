@@ -76,12 +76,12 @@
 
 ; --- State: Title Screen ---
 @state_title:
-    ; Placeholder: press START to go to GAMEPLAY
+    ; Press START to begin gameplay
     lda pad1_pressed
     and #BUTTON_START
     beq @state_done
-    lda #GAME_STATE_GAMEPLAY
-    sta game_state
+    ; Transition: load map, init systems, start gameplay
+    jsr title_screen_to_gameplay
     jmp @state_done
 
 ; --- State: Gameplay ---

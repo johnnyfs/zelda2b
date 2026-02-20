@@ -51,6 +51,7 @@ SOURCES := \
 	$(SRCDIR)/items/item_system.s \
 	$(SRCDIR)/ui/inventory.s \
 	$(SRCDIR)/ui/map_screen.s \
+	$(SRCDIR)/ui/title_screen.s \
 	$(SRCDIR)/map/map_vars.s \
 	$(SRCDIR)/map/map_collision.s \
 	$(SRCDIR)/map/map_engine.s \
