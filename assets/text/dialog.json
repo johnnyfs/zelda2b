@@ -1,0 +1,69 @@
+{
+  "encoding": "ASCII subset, uppercase only. Max 28 chars per line, 4 lines per dialog box.",
+  "npcs": {
+    "town_rauru": [
+      {"id": "rauru_elder_1", "lines": ["WELCOME TO RAURU.", "THE SLEEPING ZELDA", "AWAITS IN THE NORTH", "PALACE."]},
+      {"id": "rauru_healer_1", "lines": ["LET ME HEAL YOUR", "WOUNDS."]},
+      {"id": "rauru_hint_1", "lines": ["THE CANDLE LIGHTS", "DARK CAVES. SEEK IT", "IN THE FIRST", "PALACE."]},
+      {"id": "rauru_shop_1", "lines": ["BUY SOMETHING?"]},
+      {"id": "rauru_woman_1", "lines": ["I HEARD MONSTERS", "GROW STRONGER IN", "THE EAST."]}
+    ],
+    "town_ruto": [
+      {"id": "ruto_elder_1", "lines": ["THE HAMMER CAN", "BREAK BOULDERS.", "FIND IT IN PALACE", "TWO."]},
+      {"id": "ruto_hint_1", "lines": ["A RAFT HIDES IN", "THE THIRD PALACE.", "IT CAN CROSS THE", "GREAT SEA."]},
+      {"id": "ruto_spell_1", "lines": ["I WILL TEACH YOU", "THE JUMP SPELL."]}
+    ],
+    "town_saria": [
+      {"id": "saria_elder_1", "lines": ["SARIA TOWN WELCOMES", "YOU BRAVE HERO."]},
+      {"id": "saria_hint_1", "lines": ["THE BOOTS LET YOU", "WALK ON SHALLOW", "WATER."]},
+      {"id": "saria_spell_1", "lines": ["LEARN THE LIFE", "SPELL. IT RESTORES", "YOUR HEARTS."]}
+    ],
+    "town_mido": [
+      {"id": "mido_elder_1", "lines": ["DEATH MOUNTAIN IS", "FULL OF DANGER.", "BE PREPARED."]},
+      {"id": "mido_hint_1", "lines": ["THE FLUTE CAN CALL", "A WHIRLWIND TO", "CARRY YOU FAR."]},
+      {"id": "mido_spell_1", "lines": ["THE FAIRY SPELL", "TRANSFORMS YOU.", "FLY THROUGH LOCKED", "DOORS."]}
+    ],
+    "town_nabooru": [
+      {"id": "nabooru_elder_1", "lines": ["THE CROSS REVEALS", "INVISIBLE FOES.", "PALACE SIX HOLDS", "IT."]},
+      {"id": "nabooru_hint_1", "lines": ["THUNDER IS THE KEY", "TO THE GREAT", "PALACE GUARDIAN."]},
+      {"id": "nabooru_spell_1", "lines": ["THE THUNDER SPELL", "IS THE MOST", "POWERFUL MAGIC."]}
+    ],
+    "town_kasuto_hidden": [
+      {"id": "kasuto_elder_1", "lines": ["YOU FOUND THE", "HIDDEN TOWN!", "TAKE THIS MAGIC", "KEY."]},
+      {"id": "kasuto_hint_1", "lines": ["THE MAGIC KEY OPENS", "ALL LOCKED DOORS."]}
+    ]
+  },
+  "signs": [
+    {"id": "sign_north", "lines": ["NORTH TO THE", "SLEEPING PALACE"]},
+    {"id": "sign_cave", "lines": ["CAVE AHEAD.", "BRING A CANDLE."]},
+    {"id": "sign_sea", "lines": ["THE GREAT SEA.", "ONLY A RAFT CAN", "CROSS."]},
+    {"id": "sign_mountain", "lines": ["DEATH MOUNTAIN.", "TURN BACK IF YOU", "ARE NOT READY."]},
+    {"id": "sign_palace", "lines": ["A PALACE LIES", "WITHIN."]}
+  ],
+  "items": [
+    {"id": "item_candle", "lines": ["YOU GOT THE CANDLE!", "IT LIGHTS DARK", "CAVES."]},
+    {"id": "item_hammer", "lines": ["YOU GOT THE HAMMER!", "BREAK ROCKS AND", "BOULDERS."]},
+    {"id": "item_raft", "lines": ["YOU GOT THE RAFT!", "CROSS THE GREAT", "SEA."]},
+    {"id": "item_boots", "lines": ["YOU GOT THE BOOTS!", "WALK ON SHALLOW", "WATER."]},
+    {"id": "item_flute", "lines": ["YOU GOT THE FLUTE!", "CALL THE WHIRLWIND", "TO TRAVEL FAR."]},
+    {"id": "item_cross", "lines": ["YOU GOT THE CROSS!", "SEE INVISIBLE", "ENEMIES."]},
+    {"id": "item_glove", "lines": ["YOU GOT THE GLOVE!", "PICK UP AND THROW", "OBJECTS."]},
+    {"id": "item_magic_key", "lines": ["YOU GOT THE MAGIC", "KEY! ALL DOORS", "OPEN BEFORE YOU."]},
+    {"id": "item_heart_container", "lines": ["HEART CONTAINER!", "YOUR LIFE FORCE", "GROWS STRONGER."]},
+    {"id": "item_magic_container", "lines": ["MAGIC CONTAINER!", "YOUR MAGIC POWER", "EXPANDS."]},
+    {"id": "item_sword_white", "lines": ["THE WHITE SWORD!", "ITS BLADE GLEAMS", "WITH POWER."]},
+    {"id": "item_sword_magic", "lines": ["THE MAGICAL SWORD!", "ULTIMATE BLADE OF", "COURAGE."]},
+    {"id": "item_ring_blue", "lines": ["THE BLUE RING!", "DAMAGE IS HALVED."]},
+    {"id": "item_ring_red", "lines": ["THE RED RING!", "DAMAGE IS GREATLY", "REDUCED."]}
+  ],
+  "story": [
+    {"id": "intro_1", "lines": ["LONG AGO WHEN", "HYRULE WAS ONE", "LAND A GREAT KING", "HELD THE TRIFORCE."]},
+    {"id": "intro_2", "lines": ["BEFORE HIS DEATH", "HE HID THE TRIFORCE", "OF COURAGE IN THE", "GREAT PALACE."]},
+    {"id": "intro_3", "lines": ["A SLEEPING SPELL", "WAS CAST ON PRINCESS", "ZELDA. SHE SLEEPS", "IN THE NORTH PALACE."]},
+    {"id": "intro_4", "lines": ["ONLY THE TRIFORCE", "OF COURAGE CAN", "BREAK THE SPELL.", "LINK MUST FIND IT."]},
+    {"id": "ending_1", "lines": ["THE TRIFORCE OF", "COURAGE SHINES!", "ZELDA AWAKENS FROM", "HER LONG SLEEP."]},
+    {"id": "ending_2", "lines": ["PEACE RETURNS TO", "HYRULE. THE HERO", "LINK HAS SAVED THE", "PRINCESS!"]},
+    {"id": "game_over", "lines": ["RETURN OF GANON"]},
+    {"id": "title_screen", "lines": ["ZELDA 2B", "THE ADVENTURE OF", "LINK", "PRESS START"]}
+  ]
+}
