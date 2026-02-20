@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zelda 2B - NES Palette Preview</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #222;
+            color: #fff;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #4af;
+            border-bottom: 2px solid #4af;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #8f8;
+            margin-top: 30px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+        .palette-group {
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .palette-set {
+            margin: 15px 0;
+        }
+        .palette-label {
+            color: #fa4;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .palette-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .palette {
+            display: flex;
+            border: 2px solid #666;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .color-swatch {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            border-right: 1px solid #000;
+        }
+        .color-swatch:last-child {
+            border-right: none;
+        }
+        .color-index {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+        .notes {
+            background: #444;
+            border-left: 4px solid #4af;
+            padding: 10px 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .notes h3 {
+            margin-top: 0;
+            color: #4af;
+        }
+        .notes ul {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 Zelda 2B NES Palette Preview</h1>
+
+    <div class="notes">
+        <h3>NES Palette Constraints</h3>
+        <ul>
+            <li>4 BG palettes + 4 sprite palettes per screen</li>
+            <li>Each palette: 1 shared BG color (index 0) + 3 unique colors</li>
+            <li>Total: 64 possible NES colors (indices $00-$3F)</li>
+            <li>BG color (index 0) shared across all 4 BG palettes</li>
+        </ul>
+    </div>
+
+    <h2>Overworld Palettes</h2>
+    <div class="palette-group">
+        <div class="palette-set">
+            <div class="palette-label">Background Palettes</div>
+            <div class="palette-row">
+                <div class="palette" id="overworld-bg-0"></div>
+                <div class="palette" id="overworld-bg-1"></div>
+                <div class="palette" id="overworld-bg-2"></div>
+                <div class="palette" id="overworld-bg-3"></div>
+            </div>
+        </div>
+        <div class="palette-set">
+            <div class="palette-label">Sprite Palettes</div>
+            <div class="palette-row">
+                <div class="palette" id="overworld-spr-0"></div>
+                <div class="palette" id="overworld-spr-1"></div>
+                <div class="palette" id="overworld-spr-2"></div>
+                <div class="palette" id="overworld-spr-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Palace Palettes</h2>
+    <div class="palette-group">
+        <div class="palette-set">
+            <div class="palette-label">Background Palettes</div>
+            <div class="palette-row">
+                <div class="palette" id="palace-bg-0"></div>
+                <div class="palette" id="palace-bg-1"></div>
+                <div class="palette" id="palace-bg-2"></div>
+                <div class="palette" id="palace-bg-3"></div>
+            </div>
+        </div>
+        <div class="palette-set">
+            <div class="palette-label">Sprite Palettes</div>
+            <div class="palette-row">
+                <div class="palette" id="palace-spr-0"></div>
+                <div class="palette" id="palace-spr-1"></div>
+                <div class="palette" id="palace-spr-2"></div>
+                <div class="palette" id="palace-spr-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Cave Palettes</h2>
+    <div class="palette-group">
+        <div class="palette-set">
+            <div class="palette-label">Background Palettes</div>
+            <div class="palette-row">
+                <div class="palette" id="cave-bg-0"></div>
+                <div class="palette" id="cave-bg-1"></div>
+                <div class="palette" id="cave-bg-2"></div>
+                <div class="palette" id="cave-bg-3"></div>
+            </div>
+        </div>
+        <div class="palette-set">
+            <div class="palette-label">Sprite Palettes</div>
+            <div class="palette-row">
+                <div class="palette" id="cave-spr-0"></div>
+                <div class="palette" id="cave-spr-1"></div>
+                <div class="palette" id="cave-spr-2"></div>
+                <div class="palette" id="cave-spr-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Town Palettes</h2>
+    <div class="palette-group">
+        <div class="palette-set">
+            <div class="palette-label">Background Palettes</div>
+            <div class="palette-row">
+                <div class="palette" id="town-bg-0"></div>
+                <div class="palette" id="town-bg-1"></div>
+                <div class="palette" id="town-bg-2"></div>
+                <div class="palette" id="town-bg-3"></div>
+            </div>
+        </div>
+        <div class="palette-set">
+            <div class="palette-label">Sprite Palettes</div>
+            <div class="palette-row">
+                <div class="palette" id="town-spr-0"></div>
+                <div class="palette" id="town-spr-1"></div>
+                <div class="palette" id="town-spr-2"></div>
+                <div class="palette" id="town-spr-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Desert Palettes</h2>
+    <div class="palette-group">
+        <div class="palette-set">
+            <div class="palette-label">Background Palettes</div>
+            <div class="palette-row">
+                <div class="palette" id="desert-bg-0"></div>
+                <div class="palette" id="desert-bg-1"></div>
+                <div class="palette" id="desert-bg-2"></div>
+                <div class="palette" id="desert-bg-3"></div>
+            </div>
+        </div>
+        <div class="palette-set">
+            <div class="palette-label">Sprite Palettes</div>
+            <div class="palette-row">
+                <div class="palette" id="desert-spr-0"></div>
+                <div class="palette" id="desert-spr-1"></div>
+                <div class="palette" id="desert-spr-2"></div>
+                <div class="palette" id="desert-spr-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Sprite Palettes (Generic)</h2>
+    <div class="palette-group">
+        <div class="palette-set">
+            <div class="palette-row">
+                <div class="palette" id="sprite-0"></div>
+                <div class="palette" id="sprite-1"></div>
+                <div class="palette" id="sprite-2"></div>
+                <div class="palette" id="sprite-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // NES palette - standard RGB values for all 64 NES colors
+        const NES_RGB = [
+            '#7C7C7C', '#0000FC', '#0000BC', '#4428BC', '#940084', '#A80020', '#A81000', '#881400',
+            '#503000', '#007800', '#006800', '#005800', '#004058', '#000000', '#000000', '#000000',
+            '#BCBCBC', '#0078F8', '#0058F8', '#6844FC', '#D800CC', '#E40058', '#F83800', '#E45C10',
+            '#AC7C00', '#00B800', '#00A800', '#00A844', '#008888', '#000000', '#000000', '#000000',
+            '#F8F8F8', '#3CBCFC', '#6888FC', '#9878F8', '#F878F8', '#F85898', '#F87858', '#FCA044',
+            '#F8B800', '#B8F818', '#58D854', '#58F898', '#00E8D8', '#787878', '#000000', '#000000',
+            '#FCFCFC', '#A4E4FC', '#B8B8F8', '#D8B8F8', '#F8B8F8', '#F8A4C0', '#F0D0B0', '#FCE0A8',
+            '#F8D878', '#D8F878', '#B8F8B8', '#B8F8D8', '#00FCFC', '#F8D8F8', '#000000', '#000000'
+        ];
+
+        function renderPalette(elementId, colors) {
+            const container = document.getElementById(elementId);
+            colors.forEach(colorIndex => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.style.backgroundColor = NES_RGB[colorIndex];
+
+                const label = document.createElement('div');
+                label.className = 'color-index';
+                label.textContent = '$' + colorIndex.toString(16).toUpperCase().padStart(2, '0');
+
+                swatch.appendChild(label);
+                container.appendChild(swatch);
+            });
+        }
+
+        // Palette data
+        const palettes = {
+            overworld: {
+                bg: [[15, 9, 25, 41], [15, 2, 18, 33], [15, 8, 24, 41], [15, 0, 16, 32]],
+                spr: [[15, 41, 25, 48], [15, 18, 2, 48], [15, 22, 6, 48], [15, 39, 23, 48]]
+            },
+            palace: {
+                bg: [[15, 2, 17, 32], [15, 6, 23, 39], [15, 4, 20, 36], [15, 6, 22, 38]],
+                spr: [[15, 41, 25, 48], [15, 18, 2, 48], [15, 22, 6, 48], [15, 39, 23, 48]]
+            },
+            cave: {
+                bg: [[15, 0, 16, 32], [15, 1, 17, 33], [15, 7, 23, 39], [15, 2, 18, 34]],
+                spr: [[15, 41, 25, 48], [15, 18, 2, 48], [15, 22, 6, 48], [15, 39, 23, 48]]
+            },
+            town: {
+                bg: [[15, 7, 23, 39], [15, 6, 22, 38], [15, 9, 25, 41], [15, 0, 16, 32]],
+                spr: [[15, 41, 25, 48], [15, 18, 2, 48], [15, 22, 6, 48], [15, 39, 23, 48]]
+            },
+            desert: {
+                bg: [[15, 8, 24, 40], [15, 7, 23, 39], [15, 6, 22, 38], [15, 0, 16, 32]],
+                spr: [[15, 41, 25, 48], [15, 18, 2, 48], [15, 22, 6, 48], [15, 39, 23, 48]]
+            },
+            sprite: [[15, 41, 25, 48], [15, 18, 2, 48], [15, 22, 6, 48], [15, 39, 23, 48]]
+        };
+
+        // Render all palettes
+        ['overworld', 'palace', 'cave', 'town', 'desert'].forEach(area => {
+            for (let i = 0; i < 4; i++) {
+                renderPalette(`${area}-bg-${i}`, palettes[area].bg[i]);
+                renderPalette(`${area}-spr-${i}`, palettes[area].spr[i]);
+            }
+        });
+
+        // Render generic sprite palettes
+        for (let i = 0; i < 4; i++) {
+            renderPalette(`sprite-${i}`, palettes.sprite[i]);
+        }
+    </script>
+</body>
+</html>
