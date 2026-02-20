@@ -129,6 +129,10 @@
     ; ----- Initialize audio system -----
     jsr audio_init          ; Set up FamiStudio engine with music + SFX data
 
+    ; ----- Start overworld music -----
+    lda #SONG_OVERWORLD
+    jsr audio_play_song
+
     ; ----- Enable PPU rendering -----
     lda #PPUCTRL_NMI_ON | PPUCTRL_BG_0000 | PPUCTRL_SPR_1000
     sta PPUCTRL

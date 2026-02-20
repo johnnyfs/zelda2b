@@ -45,7 +45,7 @@ From any game code module:
 jsr audio_init
 
 ; Play a song
-lda #SONG_SILENCE          ; Song index constant
+lda #SONG_OVERWORLD        ; Song index constant
 jsr audio_play_song
 
 ; Play a sound effect
