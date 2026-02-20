@@ -22,7 +22,7 @@ AUDIO_INC = 1
 ; Song indices
 ; ============================================================================
 
-SONG_SILENCE        = 0     ; Placeholder silent song
+SONG_OVERWORLD      = 0     ; Zelda 2 overworld theme
 
 ; ============================================================================
 ; SFX indices
