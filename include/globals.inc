@@ -175,4 +175,32 @@ GLOBALS_INC = 1
 .global shop_data_table
 .global shop_screen_table
 
+; -- npc/dialog.s --
+.global dialog_init
+.global dialog_open
+.global dialog_update
+.global dialog_close
+.global npc_init
+.global npc_spawn_screen
+.global npc_draw
+.global npc_check_interact
+
+; -- dialog zero-page vars --
+.globalzp dialog_state
+.globalzp dialog_id
+.globalzp dialog_ptr_lo
+.globalzp dialog_ptr_hi
+.globalzp dialog_char_timer
+.globalzp dialog_line
+.globalzp dialog_col
+.globalzp dialog_page
+.globalzp npc_count
+
+; -- dialog/NPC RAM vars --
+.global npc_x
+.global npc_y
+.global npc_tile
+.global npc_dialog_id
+.global dialog_line_buf
+
 .endif ; GLOBALS_INC

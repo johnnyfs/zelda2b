@@ -17,6 +17,7 @@
 .include "warps.inc"
 .include "inventory.inc"
 .include "shop.inc"
+.include "dialog.inc"
 
 .segment "PRG_FIXED"
 
@@ -64,6 +65,9 @@
     cmp #GAME_STATE_MAP_SCREEN
     beq @state_map_screen
 
+    cmp #GAME_STATE_DIALOG
+    beq @state_dialog
+
     cmp #GAME_STATE_GAME_OVER
     beq @state_game_over
 
@@ -82,6 +86,10 @@
 
 ; --- State: Gameplay ---
 @state_gameplay:
+    ; Check NPC dialog interaction FIRST (A near NPC = dialog, not sword)
+    jsr npc_check_interact
+    bcs @state_done             ; Dialog opened, skip rest of gameplay frame
+
     ; Player movement, animation, collision, and sprite drawing
     jsr player_update
 
@@ -109,10 +117,14 @@
     ; Update rupee counter display (queues PPU buffer write if in shop)
     jsr shop_update_rupee_display
 
+    ; Draw NPC sprites
+    jsr npc_draw
+
     ; Check for cave warp (door tile warps)
     jsr warp_check
     cmp #$01                ; Did a warp occur?
     bne @no_warp
+    jsr npc_spawn_screen    ; Spawn NPCs for the new screen
     jmp @state_done         ; Warp already loaded screen + HUD, skip transition
 @no_warp:
 
@@ -122,6 +134,7 @@
     bne @no_transition
     jsr hud_draw_full       ; Redraw HUD after screen load overwrote it
     jsr mark_current_screen_visited  ; Track visited screens for minimap
+    jsr npc_spawn_screen    ; Spawn NPCs for the new screen
 @no_transition:
 
     jmp @state_done
@@ -146,6 +159,11 @@
 ; --- State: Map Screen ---
 @state_map_screen:
     jsr map_screen_update
+    jmp @state_done
+
+; --- State: Dialog ---
+@state_dialog:
+    jsr dialog_update
     jmp @state_done
 
 ; --- State: Game Over ---

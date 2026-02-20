@@ -15,6 +15,7 @@
 .include "bombs.inc"
 .include "hud.inc"
 .include "inventory.inc"
+.include "dialog.inc"
 
 .segment "PRG_FIXED"
 
@@ -105,7 +106,9 @@
     jsr bomb_init           ; Clear bomb slots, set starting inventory
     jsr item_system_init    ; Initialize item system (gives sword+bombs, clears visited)
     jsr inventory_init      ; Initialize inventory cursor state
+    jsr dialog_init         ; Initialize dialog/NPC system
     jsr enemy_spawn_screen  ; Spawn test enemies on starting screen
+    jsr npc_spawn_screen    ; Spawn NPCs for starting screen
 
     ; ----- Initialize HUD (status bar) -----
     ; Rendering must be off for direct VRAM writes.
