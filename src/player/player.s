@@ -472,17 +472,15 @@ SCREEN_RIGHT        = 240
 ; ============================================================================
 ; Source: sprite_tiles.chr (LA DX ripped via LINK_TILES.json).
 ;
-; IMPORTANT: LINK_TILES.json has LEFT/RIGHT labels SWAPPED vs actual pixel data!
-;   $10-$13 are labeled "walk_left" but pixels face RIGHT
-;   $18-$1B are labeled "walk_right" but pixels face LEFT
-; This table corrects the mapping so button presses match visual direction.
-;
-; CHR layout (verified by pixel-level dump):
+; CHR layout (verified by pixel-level ASCII dump of actual tile data):
 ;   $00-$03 front-face (down)  $04-$07 front-face frame 2
 ;   $08-$0B back (up)          $0C-$0F back frame 2
-;   $10-$13 faces RIGHT        $14-$17 faces RIGHT frame 2
-;   $18-$1B faces LEFT         $1C-$1F faces LEFT frame 2
+;   $10-$13 faces LEFT         $14-$17 faces LEFT frame 2
+;   $18-$1B faces RIGHT        $1C-$1F faces RIGHT frame 2
 ;   $20 shield_front  $21 shield_left  $2D sword_vert  $2E sword_horiz
+;
+; LINK_TILES.json labels ARE correct: walk_left=$10, walk_right=$18.
+; PR #17 incorrectly swapped them based on a faulty pixel dump analysis.
 ;
 ; Enums: DIR_UP=0 DIR_DOWN=1 DIR_LEFT=2 DIR_RIGHT=3
 ; Index = (player_dir * 2) + player_anim_frame
@@ -491,12 +489,12 @@ SCREEN_RIGHT        = 240
 sprite_tile_table:
     .byte $08, $0C    ; DIR_UP(0)    back-facing (CHR $08/$0C)
     .byte $00, $04    ; DIR_DOWN(1)  front-facing (CHR $00/$04)
-    .byte $18, $1C    ; DIR_LEFT(2)  left-facing (CHR $18/$1C, json mislabels "right")
-    .byte $10, $14    ; DIR_RIGHT(3) right-facing (CHR $10/$14, json mislabels "left")
+    .byte $10, $14    ; DIR_LEFT(2)  left-facing (CHR $10/$14)
+    .byte $18, $1C    ; DIR_RIGHT(3) right-facing (CHR $18/$1C)
 
 ; Attack body tile table: indexed by player_dir, uses walk frame 0 body.
 attack_tile_table:
     .byte $08         ; DIR_UP(0)    back-facing
     .byte $00         ; DIR_DOWN(1)  front-facing
-    .byte $18         ; DIR_LEFT(2)  left-facing (CHR $18)
-    .byte $10         ; DIR_RIGHT(3) right-facing (CHR $10)
+    .byte $10         ; DIR_LEFT(2)  left-facing (CHR $10)
+    .byte $18         ; DIR_RIGHT(3) right-facing (CHR $18)
