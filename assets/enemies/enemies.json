@@ -1,24 +1,207 @@
 {
   "enemies": [
-    {"name": "Octorok", "hp": 2, "damage": 1, "speed": 1, "behavior": 0, "drop_table": 0},
-    {"name": "Moblin", "hp": 3, "damage": 2, "speed": 1, "behavior": 1, "drop_table": 1},
-    {"name": "Keese", "hp": 1, "damage": 1, "speed": 2, "behavior": 2, "drop_table": 0},
-    {"name": "Stalfos", "hp": 3, "damage": 2, "speed": 1, "behavior": 3, "drop_table": 1},
-    {"name": "Tektite", "hp": 2, "damage": 1, "speed": 2, "behavior": 4, "drop_table": 0},
-    {"name": "Leever", "hp": 2, "damage": 1, "speed": 1, "behavior": 5, "drop_table": 0},
-    {"name": "Zora", "hp": 3, "damage": 2, "speed": 0, "behavior": 6, "drop_table": 1},
-    {"name": "Darknut", "hp": 6, "damage": 3, "speed": 1, "behavior": 7, "drop_table": 2},
-    {"name": "IronKnuckle", "hp": 8, "damage": 4, "speed": 1, "behavior": 8, "drop_table": 3},
-    {"name": "Wizzrobe", "hp": 4, "damage": 3, "speed": 0, "behavior": 9, "drop_table": 2},
-    {"name": "BubbleRed", "hp": 255, "damage": 0, "speed": 2, "behavior": 10, "drop_table": 255},
-    {"name": "BubbleBlue", "hp": 255, "damage": 0, "speed": 2, "behavior": 11, "drop_table": 255},
-    {"name": "BossHorsehead", "hp": 16, "damage": 4, "speed": 1, "behavior": 128, "drop_table": 4},
-    {"name": "BossHelmethead", "hp": 20, "damage": 4, "speed": 1, "behavior": 129, "drop_table": 4},
-    {"name": "BossRebonack", "hp": 24, "damage": 5, "speed": 2, "behavior": 130, "drop_table": 4},
-    {"name": "BossCarock", "hp": 20, "damage": 4, "speed": 0, "behavior": 131, "drop_table": 4},
-    {"name": "BossGooma", "hp": 28, "damage": 5, "speed": 1, "behavior": 132, "drop_table": 4},
-    {"name": "BossBarba", "hp": 24, "damage": 5, "speed": 1, "behavior": 133, "drop_table": 4},
-    {"name": "BossThunderbird", "hp": 32, "damage": 6, "speed": 2, "behavior": 134, "drop_table": 4},
-    {"name": "BossDarkLink", "hp": 32, "damage": 4, "speed": 2, "behavior": 135, "drop_table": 4}
-  ]
+    {
+      "name": "Octorok",
+      "hp": 2,
+      "damage": 1,
+      "speed": 1,
+      "behavior": 0,
+      "drop_table": 0,
+      "notes": "Overworld. Walks, shoots rocks in 4 dirs. Common early enemy."
+    },
+    {
+      "name": "Moblin",
+      "hp": 3,
+      "damage": 2,
+      "speed": 1,
+      "behavior": 1,
+      "drop_table": 1,
+      "notes": "Overworld. Walks toward player, throws spears. Medium difficulty."
+    },
+    {
+      "name": "Keese",
+      "hp": 1,
+      "damage": 1,
+      "speed": 2,
+      "behavior": 2,
+      "drop_table": 0,
+      "notes": "Caves/palaces. Erratic flying pattern. Weak but annoying."
+    },
+    {
+      "name": "Stalfos",
+      "hp": 3,
+      "damage": 2,
+      "speed": 1,
+      "behavior": 3,
+      "drop_table": 1,
+      "notes": "Palaces. Walks and sword attacks. Can block with shield."
+    },
+    {
+      "name": "Tektite",
+      "hp": 2,
+      "damage": 1,
+      "speed": 2,
+      "behavior": 4,
+      "drop_table": 0,
+      "notes": "Overworld/mountain. Hops in arc pattern."
+    },
+    {
+      "name": "Leever",
+      "hp": 2,
+      "damage": 1,
+      "speed": 1,
+      "behavior": 5,
+      "drop_table": 0,
+      "notes": "Desert. Emerges from sand, moves toward player."
+    },
+    {
+      "name": "Zora",
+      "hp": 3,
+      "damage": 2,
+      "speed": 0,
+      "behavior": 6,
+      "drop_table": 1,
+      "notes": "Water. Surfaces, shoots fireball, submerges. Cannot be hit underwater."
+    },
+    {
+      "name": "Darknut",
+      "hp": 6,
+      "damage": 3,
+      "speed": 1,
+      "behavior": 7,
+      "drop_table": 2,
+      "notes": "Palaces. Heavy armor, shield blocks frontal attacks. Must hit from behind/side."
+    },
+    {
+      "name": "IronKnuckle",
+      "hp": 8,
+      "damage": 4,
+      "speed": 1,
+      "behavior": 8,
+      "drop_table": 3,
+      "notes": "Late palaces. Like Darknut but tougher. Throws sword at half HP."
+    },
+    {
+      "name": "Wizzrobe",
+      "hp": 4,
+      "damage": 3,
+      "speed": 0,
+      "behavior": 9,
+      "drop_table": 2,
+      "notes": "Palaces. Teleports, shoots magic beams. Only vulnerable briefly."
+    },
+    {
+      "name": "BubbleRed",
+      "hp": 255,
+      "damage": 0,
+      "speed": 2,
+      "behavior": 10,
+      "drop_table": 255,
+      "notes": "Palaces. Invincible bouncing skull. Contact disables sword temporarily."
+    },
+    {
+      "name": "BubbleBlue",
+      "hp": 255,
+      "damage": 0,
+      "speed": 2,
+      "behavior": 11,
+      "drop_table": 255,
+      "notes": "Palaces. Contact re-enables sword. Cures red bubble effect."
+    },
+    {
+      "name": "BossHorsehead",
+      "hp": 16,
+      "damage": 4,
+      "speed": 1,
+      "behavior": 128,
+      "drop_table": 4,
+      "notes": "Palace 1 boss. Charges, swings mace. Hit head to damage."
+    },
+    {
+      "name": "BossHelmethead",
+      "hp": 20,
+      "damage": 4,
+      "speed": 1,
+      "behavior": 129,
+      "drop_table": 4,
+      "notes": "Palace 2 boss. Heads detach and float. Hit body."
+    },
+    {
+      "name": "BossRebonack",
+      "hp": 24,
+      "damage": 5,
+      "speed": 2,
+      "behavior": 130,
+      "drop_table": 4,
+      "notes": "Palace 3 boss. Iron Knuckle on horseback, then dismounts."
+    },
+    {
+      "name": "BossCarock",
+      "hp": 20,
+      "damage": 4,
+      "speed": 0,
+      "behavior": 131,
+      "drop_table": 4,
+      "notes": "Palace 4 boss. Wizard, teleports + magic. Reflect spell needed."
+    },
+    {
+      "name": "BossGooma",
+      "hp": 28,
+      "damage": 5,
+      "speed": 1,
+      "behavior": 132,
+      "drop_table": 4,
+      "notes": "Palace 5 boss. Large beast, charges and throws boulders."
+    },
+    {
+      "name": "BossBarba",
+      "hp": 24,
+      "damage": 5,
+      "speed": 1,
+      "behavior": 133,
+      "drop_table": 4,
+      "notes": "Palace 6 boss. Dragon, emerges from lava pits."
+    },
+    {
+      "name": "BossThunderbird",
+      "hp": 32,
+      "damage": 6,
+      "speed": 2,
+      "behavior": 134,
+      "drop_table": 4,
+      "notes": "Great Palace mini-boss. Flying, invulnerable until Thunder spell reveals weak point."
+    },
+    {
+      "name": "BossDarkLink",
+      "hp": 32,
+      "damage": 4,
+      "speed": 2,
+      "behavior": 135,
+      "drop_table": 4,
+      "notes": "Great Palace final boss. Mirrors player's moves. Must find pattern."
+    }
+  ],
+  "behavior_ids": {
+    "0": "WALK_AND_SHOOT — walks randomly, shoots projectile toward player",
+    "1": "WALK_AND_CHARGE — walks toward player, melee attack",
+    "2": "FLY_ERRATIC — erratic flying movement",
+    "3": "WALK_AND_BLOCK — walks, attacks, can block with shield",
+    "4": "HOP_ARC — jumps in arc patterns",
+    "5": "EMERGE_AND_CHASE — emerges from ground, chases player",
+    "6": "SURFACE_AND_SHOOT — surfaces from water, shoots, submerges",
+    "7": "ARMORED_PATROL — patrols, blocks frontal attacks",
+    "8": "ARMORED_AGGRESSIVE — like 7 but throws projectile at half HP",
+    "9": "TELEPORT_AND_SHOOT — teleports, shoots from new position",
+    "10": "BOUNCE_CURSE — invincible, bouncing, contact curses (no sword)",
+    "11": "BOUNCE_CURE — invincible, bouncing, contact cures curse",
+    "128+": "BOSS_* — unique boss patterns (see individual boss notes)"
+  },
+  "drop_tables": {
+    "0": "DROPS_COMMON — hearts, small magic, rarely rupees",
+    "1": "DROPS_MEDIUM — hearts, magic, rupees, rarely bombs",
+    "2": "DROPS_RARE — good chance of rupees, bombs, magic jars",
+    "3": "DROPS_VALUABLE — high chance of large magic, rupees, bombs",
+    "4": "DROPS_BOSS — heart container + item (fixed per palace)",
+    "255": "DROPS_NONE — no drops (bubbles, etc.)"
+  }
 }
