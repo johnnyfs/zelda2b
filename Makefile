@@ -33,6 +33,8 @@ SOURCES := \
 	$(SRCDIR)/mmc3.s \
 	$(SRCDIR)/sprites.s \
 	$(SRCDIR)/metatile.s \
+	$(SRCDIR)/hud.s \
+	$(SRCDIR)/ui.s \
 	$(SRCDIR)/nmi.s \
 	$(SRCDIR)/init.s \
 	$(SRCDIR)/main.s \
