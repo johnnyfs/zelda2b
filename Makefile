@@ -27,7 +27,16 @@ ASFLAGS := -I $(INCDIR) --cpu 6502
 SOURCES := \
 	$(SRCDIR)/header.s \
 	$(SRCDIR)/vectors.s \
-	$(SRCDIR)/init.s
+	$(SRCDIR)/globals.s \
+	$(SRCDIR)/ppu_buffer.s \
+	$(SRCDIR)/gamepad.s \
+	$(SRCDIR)/mmc3.s \
+	$(SRCDIR)/sprites.s \
+	$(SRCDIR)/metatile.s \
+	$(SRCDIR)/nmi.s \
+	$(SRCDIR)/init.s \
+	$(SRCDIR)/main.s \
+	$(SRCDIR)/chr_data.s
 
 # Object files
 OBJECTS := $(patsubst %.s,$(BLDDIR)/%.o,$(SOURCES))
